@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import path from "path";
 import { writeFile } from "fs/promises";
 import { existsSync, write } from "fs";
@@ -8,7 +7,7 @@ import embedPdfDocument from "./embed_document";
 
 
 
-export const POST = async(req: Request, res: Response) => {
+export const POST = async(req: Request) => {
 
     const formData = await req.formData()
 
