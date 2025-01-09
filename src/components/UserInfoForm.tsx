@@ -13,7 +13,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const UserInfoForm = () => {
+interface UserInfoFormProps{
+  statement: string,
+  role: string
+}
+
+const UserInfoForm = ({statement, role} : UserInfoFormProps)  => {
   // Define the schema with validation
   const formSchema = z
     .object({
@@ -50,98 +55,109 @@ const UserInfoForm = () => {
     alert("Form submitted successfully!");
   };
 
-  return (
-    <div className="w-full max-w-md mx-auto">
-      <h1 className="text-xl font-semibold mb-4">User Information Form</h1>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {/* Name Field */}
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Enter your name" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Surname Field */}
-          <FormField
-            control={form.control}
-            name="surname"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Surname</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Enter your surname" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Email Field */}
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Enter your email" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Password Field */}
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input {...field} type="password" placeholder="Enter your password" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Confirm Password Field */}
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="password"
-                    placeholder="Confirm your password"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Submit Button */}
-          <Button type="submit" className="w-full">
-            Submit
-          </Button>
-        </form>
-      </Form>
-    </div>
-  );
+  return(
+    <div className="w-full max-w-md mx-auto mt-10">
+          <Form {...form}>
+            <div className="flex flex-col mb-3 items-start">
+              <span className="text-3xl font-bold text-green-600">
+                Create Account
+              </span>
+              <span className="">{statement}</span>
+            </div>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Name Field */}
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter your name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+    
+              {/* Surname Field */}
+              <FormField
+                control={form.control}
+                name="surname"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Surname</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter your surname" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+    
+              {/* Email Field */}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter your email" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+    
+              {/* Password Field */}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="password"
+                        placeholder="Enter your password"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+    
+              {/* Confirm Password Field */}
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="password"
+                        placeholder="Confirm your password"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+    
+              {/* Submit Button */}
+              <div className="form-controls mt-2 flex flex-col w-full mb-5">
+                    <Button className="bg-green-600 hover:bg-green-500"
+                        type="submit"
+                    >Submit</Button>
+                </div>
+            </form>
+          </Form>
+        </div>
+  )
 };
 
 export default UserInfoForm;

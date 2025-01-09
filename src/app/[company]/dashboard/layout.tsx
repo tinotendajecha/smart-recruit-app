@@ -17,45 +17,54 @@ import {
   BrainCircuitIcon,
 } from "lucide-react";
 
+// import { useRouter } from "next/router";
+
 export default function DashboardLayout({
   children,
+  params
 }: {
   children: React.ReactNode;
+  params: { company: string };
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const pathname = usePathname();
+
+  // const router = useRouter()
+  const { company } = params
+
 
   const navItems = [
     {
       name: "Dashboard",
       icon: <LayoutDashboard className="w-5 h-5" />,
-      path: "/dashboard",
+      path: `/${company}/dashboard`,
     },
     {
       name: "Jobs",
       icon: <Briefcase className="w-5 h-5" />,
-      path: "/dashboard/jobs",
+      path: `/${company}/dashboard/jobs`,
     },
     {
       name: "Applications",
       icon: <Users className="w-5 h-5" />,
-      path: "/dashboard/applications",
+      path: `/${company}/dashboard/applications`,
     },
     {
       name: "Candidate Helper",
       icon: <MessageSquare className="w-5 h-5" />,
-      path: "/dashboard/chat",
-    },
-    {
-      name: "Settings",
-      icon: <Settings className="w-5 h-5" />,
-      path: "/dashboard/settings",
+      path: `/${company}/dashboard/chat`,
     },
     {
       name: "Team",
       icon: <UserPlus className="w-5 h-5" />,
-      path: "/dashboard/team",
+      path: `/${company}/dashboard/team`,
     },
+    {
+      name: "Settings",
+      icon: <Settings className="w-5 h-5" />,
+      path: `/${company}/dashboard/settings`,
+    },
+    
   ];
 
   return (

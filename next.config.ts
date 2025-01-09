@@ -10,9 +10,9 @@ const nextConfig: NextConfig = {
 
     return config;
   },
-  images: {
-    domains: ['unsplash.com'], // Add this line to allow Unsplash images
-  },
+  // images: {
+  //   domains: ['unsplash.com'], // Add this line to allow Unsplash images
+  // },
 };
 
 export default nextConfig;

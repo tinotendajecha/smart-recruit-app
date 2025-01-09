@@ -32,7 +32,7 @@ export default function Home() {
               <Link href="#features" className="text-gray-600 hover:text-gray-900">Features</Link>
               <Link href="#how-it-works" className="text-gray-600 hover:text-gray-900">How it Works</Link>
               <Link href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>
-              <Link href="/register-company">
+              <Link href="/register/company">
                 <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full font-medium transition-colors">
                   Try Demo
                 </button>

@@ -13,8 +13,8 @@ export default function ChatAgentPage() {
               <p className="text-3xl font-bold text-blue-600">98.5%</p>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="text-lg font-medium mb-2">Avg. Response Time</h3>
-              <p className="text-3xl font-bold text-purple-600">1.2s</p>
+              <h3 className="text-lg font-medium mb-2">Total Documents</h3>
+              <p className="text-3xl font-bold text-purple-600">25</p>
             </div>
           </div>
           
