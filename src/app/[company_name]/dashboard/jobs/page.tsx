@@ -3,12 +3,17 @@
 import { Briefcase, Plus, Eye, Edit, Trash2, Building, MapPin, Clock, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 
-export default function JobsPage({params} : {params: {company: string}}) {
+import { useParams } from 'next/navigation';
+
+export default function JobsPage() {
+
+  const { company_name } = useParams();
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <h1 className="text-2xl font-semibold mb-6">Jobs Management</h1>
       <div className="mb-6">
-        <Link href={`/${params.company}/dashboard/jobs/create`}>
+        <Link href={`/${company_name}/dashboard/jobs/create`}>
         <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 inline-flex items-center gap-2">
           <Plus className="w-5 h-5" />
           Create New Job
