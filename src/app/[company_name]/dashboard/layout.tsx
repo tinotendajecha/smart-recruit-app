@@ -20,6 +20,7 @@ import {
 import { useParams } from "next/navigation";
 
 // import { useRouter } from "next/router";
+import MobileMenu from "@/components/MobileMenu";
 
 export default function DashboardLayout({
   children,
@@ -28,8 +29,6 @@ export default function DashboardLayout({
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const pathname = usePathname();
-
-  
 
   // const router = useRouter()
   const { company_name } = useParams();
@@ -74,8 +73,8 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside
         className={`bg-white w-64 min-h-screen p-4 shadow-lg ${
-          isSidebarOpen ? "" : "hidden"
-        }`}
+          isSidebarOpen ? "md:block" : "hidden"
+        } hidden `}
       >
         <div className=" flex items-center space-x-2 mb-8 mt-1">
               <BrainCircuitIcon className="h-8 w-8 text-green-600" />
@@ -108,7 +107,7 @@ export default function DashboardLayout({
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-gray-100 rounded-lg hidden md:block"
               >
                 <svg
                   className="w-6 h-6"
@@ -124,6 +123,9 @@ export default function DashboardLayout({
                   />
                 </svg>
               </button>
+              <div className="md:hidden">
+                <MobileMenu />
+              </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input

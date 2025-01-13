@@ -28,7 +28,7 @@ export default function Home() {
                 Smart<span className="text-green-600">Recruit</span>
               </span>
             </div>
-            <div className="flex items-center space-x-6">
+            <div className=" items-center space-x-6 hidden md:flex">
               <Link href="#features" className="text-gray-600 hover:text-gray-900">Features</Link>
               <Link href="#how-it-works" className="text-gray-600 hover:text-gray-900">How it Works</Link>
               <Link href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</Link>

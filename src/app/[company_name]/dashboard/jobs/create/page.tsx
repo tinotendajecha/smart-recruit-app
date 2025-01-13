@@ -52,6 +52,8 @@ export default function CreateJobPage() {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-500">
+        <span>Dashboard</span>
+        <ChevronRight className="w-4 h-4 mx-2" />
         <span>Jobs</span>
         <ChevronRight className="w-4 h-4 mx-2" />
         <span className="text-gray-900">Create New Job</span>
