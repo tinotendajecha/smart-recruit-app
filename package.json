@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
     "@hookform/resolvers": "^3.9.1",
     "@langchain/community": "^0.3.17",
     "@langchain/core": "^0.3.22",
