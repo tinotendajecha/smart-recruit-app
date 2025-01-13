@@ -1,5 +1,5 @@
 import { Dialog } from "@headlessui/react";
-import { X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { usePathname } from "next/navigation";
@@ -61,22 +61,10 @@ export default function MobileMenu() {
   return (
     <div>
       <button
-        className="p-2 hover:bg-gray-100 rounded-lg"
+        className=" hover:bg-gray-100 rounded-lg"
         onClick={() => setIsOpen(true)}
       >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
+        <Menu size={35}/>
       </button>
 
       <Dialog

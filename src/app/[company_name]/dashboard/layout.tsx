@@ -33,7 +33,6 @@ export default function DashboardLayout({
   // const router = useRouter()
   const { company_name } = useParams();
 
-
   const navItems = [
     {
       name: "Dashboard",
@@ -65,7 +64,6 @@ export default function DashboardLayout({
       icon: <Settings className="w-5 h-5" />,
       path: `/${company_name}/dashboard/settings`,
     },
-    
   ];
 
   return (
@@ -77,11 +75,11 @@ export default function DashboardLayout({
         } hidden `}
       >
         <div className=" flex items-center space-x-2 mb-8 mt-1">
-              <BrainCircuitIcon className="h-8 w-8 text-green-600" />
-              <span className="text-2xl font-bold">
-                Smart<span className="text-green-600">Recruit</span>
-              </span>
-            </div>
+          <BrainCircuitIcon className="h-8 w-8 text-green-600" />
+          <span className="text-2xl font-bold">
+            Smart<span className="text-green-600">Recruit</span>
+          </span>
+        </div>
 
         <nav>
           {navItems.map((item) => (
@@ -103,8 +101,50 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
         <header className="bg-white shadow-sm">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col">
+            <div className="flex justify-between items-center px-2 py-1 md:hidden">
+              <div className="md:hidden">
+                <MobileMenu />
+              </div>
+
+              <div className=" flex items-center  mb-2 mt-1">
+                <BrainCircuitIcon
+                  size={30}
+                  className="h-8 w-8 text-green-600"
+                />
+                <span className="text-2xl font-bold">
+                  Smart<span className="text-green-600">Recruit</span>
+                </span>
+              </div>
+
+              <div className="flex items-center">
+                <button className="p-2 hover:bg-gray-100 rounded-full relative">
+                  <Bell className="w-6 h-6" />
+                  <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+                <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
+                  <img
+                    src="https://ui-avatars.com/api/?name=Admin+User"
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="relative w-full md:hidden mb-3 ml-4">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="pl-10 w-3/4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 "
+                />
+              </div>
+          </div>
+
+          <div className="flex items-center justify-between md:p-4">
+            <div className="flex items-center space-x-4 ">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="p-2 hover:bg-gray-100 rounded-lg hidden md:block"
@@ -123,20 +163,20 @@ export default function DashboardLayout({
                   />
                 </svg>
               </button>
-              <div className="md:hidden">
+              {/* <div className="md:hidden">
                 <MobileMenu />
-              </div>
-              <div className="relative">
+              </div> */}
+              <div className="relative hidden md:block">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 "
                 />
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="items-center space-x-4 hidden md:flex">
               <button className="p-2 hover:bg-gray-100 rounded-full relative">
                 <Bell className="w-6 h-6" />
                 <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -154,9 +194,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
   );
