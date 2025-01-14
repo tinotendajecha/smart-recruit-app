@@ -15,6 +15,8 @@ import {
   ChevronDown,
   Search,
   BrainCircuitIcon,
+  Bot,
+  FileText,
 } from "lucide-react";
 
 import { useParams } from "next/navigation";
@@ -63,6 +65,16 @@ export default function DashboardLayout({
       name: "Settings",
       icon: <Settings className="w-5 h-5" />,
       path: `/${company_name}/dashboard/settings`,
+    },
+    {
+      name: "My Applications",
+      icon: <FileText className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/my-applications`,
+    },
+    {
+      name: "Chat Assistant",
+      icon: <Bot className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/candidate-chat`,
     },
   ];
 
@@ -134,13 +146,13 @@ export default function DashboardLayout({
             </div>
 
             <div className="relative w-full md:hidden mb-3 ml-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="pl-10 w-3/4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 "
-                />
-              </div>
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="pl-10 w-3/4 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 "
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-between md:p-4">

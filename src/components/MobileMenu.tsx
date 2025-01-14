@@ -1,21 +1,21 @@
 import { Dialog } from "@headlessui/react";
-import { Menu, X } from "lucide-react";
+import { Bot, FileText, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 
 import {
-    LayoutDashboard,
-    Briefcase,
-    Users,
-    MessageSquare,
-    Settings,
-    UserPlus,
-    Bell,
-    ChevronDown,
-    Search,
-    BrainCircuitIcon,
-  } from "lucide-react";
+  LayoutDashboard,
+  Briefcase,
+  Users,
+  MessageSquare,
+  Settings,
+  UserPlus,
+  Bell,
+  ChevronDown,
+  Search,
+  BrainCircuitIcon,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function MobileMenu() {
@@ -55,7 +55,16 @@ export default function MobileMenu() {
       icon: <Settings className="w-5 h-5" />,
       path: `/${company_name}/dashboard/settings`,
     },
-    
+    {
+      name: "My Applications",
+      icon: <FileText className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/my-applications`,
+    },
+    {
+      name: "Chat Assistant",
+      icon: <Bot className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/candidate-chat`,
+    },
   ];
 
   return (
@@ -64,7 +73,7 @@ export default function MobileMenu() {
         className=" hover:bg-gray-100 rounded-lg"
         onClick={() => setIsOpen(true)}
       >
-        <Menu size={35}/>
+        <Menu size={35} />
       </button>
 
       <Dialog
@@ -75,21 +84,24 @@ export default function MobileMenu() {
         <div className="flex items-center justify-center min-h-screen bg-black/50">
           <div className="bg-white w-full max-w-sm p-6 rounded-lg shadow-lg">
             <nav className="space-y-4">
-              <div onClick={() => setIsOpen(false)} className="flex justify-end">
+              <div
+                onClick={() => setIsOpen(false)}
+                className="flex justify-end"
+              >
                 <X size={30} />
               </div>
               {navItems.map((item) => (
-            <a
-              key={item.name}
-              href={item.path}
-              className={`flex items-center space-x-3 w-full p-3 rounded-lg hover:bg-gray-100 transition-colors ${
-                pathname === item.path ? "bg-green-50 text-green-600" : ""
-              }`}
-            >
-              {item.icon}
-              <span>{item.name}</span>
-            </a>
-          ))}
+                <a
+                  key={item.name}
+                  href={item.path}
+                  className={`flex items-center space-x-3 w-full p-3 rounded-lg hover:bg-gray-100 transition-colors ${
+                    pathname === item.path ? "bg-green-50 text-green-600" : ""
+                  }`}
+                >
+                  {item.icon}
+                  <span>{item.name}</span>
+                </a>
+              ))}
             </nav>
           </div>
         </div>

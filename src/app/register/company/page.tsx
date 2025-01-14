@@ -53,7 +53,7 @@ const page = () => {
           className="w-full max-w-md space-y-6"
         >
           <div className="flex flex-col mb-3 items-start">
-            <span className="text-2xl md:text-3xl font-bold text-green-600">
+            <span className="text-3xl md:text-4xl font-bold text-green-600">
               Register Company
             </span>
             <span className="text-sm text-gray-600">
