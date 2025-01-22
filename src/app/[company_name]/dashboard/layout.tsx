@@ -193,6 +193,7 @@ export default function DashboardLayout({
                 <Bell className="w-6 h-6" />
                 <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
+              <Link href={`/${company_name}/dashboard/my-profile`}>
               <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
                 <img
                   src="https://ui-avatars.com/api/?name=Admin+User"
@@ -201,6 +202,7 @@ export default function DashboardLayout({
                 />
                 <ChevronDown className="w-4 h-4" />
               </button>
+              </Link>
             </div>
           </div>
         </header>
