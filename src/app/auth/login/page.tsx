@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 import { useState,useEffect } from "react";
-import { LoadingDots, LoadingBar } from "@/components/ui/loading";
+import { LoadingDots, LoadingBar, Loading } from "@/components/ui/loading";
 
 const page = () => {
 
@@ -43,12 +43,17 @@ const page = () => {
     },
   });
 
+  function sleep(ms:number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
 
       // Set loading state to true
       setIsLoading(true)
 
+      // await sleep(2000)
       const email = values.email;
       const password = values.password;
 
@@ -69,10 +74,12 @@ const page = () => {
         setError(data.message)
         setIsLoading(false)
       }
-      router.push('/yirifi/dashboard')
+      
 
       // Set loading state to false
       setIsLoading(false)
+
+      router.push('/yirifi/dashboard')
       
     } catch (error) {
       console.log('Something went wrong during login!')
@@ -82,7 +89,9 @@ const page = () => {
   // Add animation
   if(loading){
     return(
-      <LoadingBar />
+     <div className="flex items-center justify-center h-screen">
+       <Loading text="Signing In..."/>
+     </div>
     )
   }
 

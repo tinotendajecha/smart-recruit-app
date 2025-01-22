@@ -64,12 +64,12 @@ export const Loading: React.FC<LoadingProps> = ({
 
 // Export smaller components for specific use cases
 export const LoadingDots = () => (
-  <div className="flex space-x-1">
+  <div className="flex space-x-1 items-center justify-center mt-64">
     {[1, 2, 3].map((dot) => (
       <div
         key={dot}
         className="w-2 h-2 bg-green-600 rounded-full animate-bounce"
-        style={{ animationDelay: `${dot * 0.2}s` }}
+        style={{ animationDelay: `${dot * 0.1}s` }}
       />
     ))}
   </div>
