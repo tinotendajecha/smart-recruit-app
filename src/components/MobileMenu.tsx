@@ -1,5 +1,5 @@
 import { Dialog } from "@headlessui/react";
-import { Bot, FileText, Menu, X } from "lucide-react";
+import { Bot, FileText, Mail, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { usePathname } from "next/navigation";
@@ -65,6 +65,11 @@ export default function MobileMenu() {
       icon: <Bot className="w-5 h-5" />,
       path: `/${company_name}/dashboard/candidate-chat`,
     },
+    {
+      name: "Invite",
+      icon: <Mail className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/invites`,
+    },
   ];
 
   return (
@@ -86,8 +91,14 @@ export default function MobileMenu() {
             <nav className="space-y-4">
               <div
                 onClick={() => setIsOpen(false)}
-                className="flex justify-end"
+                className="flex items-center justify-between"
               >
+                <div className=" flex items-center space-x-2">
+                  <BrainCircuitIcon className="h-8 w-8 text-green-600" />
+                  <span className="text-2xl font-bold">
+                    Smart<span className="text-green-600">Recruit</span>
+                  </span>
+                </div>
                 <X size={30} />
               </div>
               {navItems.map((item) => (

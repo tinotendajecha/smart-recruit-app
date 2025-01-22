@@ -17,6 +17,7 @@ import {
   BrainCircuitIcon,
   Bot,
   FileText,
+  Mail,
 } from "lucide-react";
 
 import { useParams } from "next/navigation";
@@ -75,6 +76,10 @@ export default function DashboardLayout({
       name: "Chat Assistant",
       icon: <Bot className="w-5 h-5" />,
       path: `/${company_name}/dashboard/candidate-chat`,
+    },{
+      name: "Invite",
+      icon:<Mail className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/invites`,
     },
   ];
 

@@ -49,13 +49,11 @@ const page = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      const email = values.email;
+      const password = values.password;
 
       // Set loading state to true
       setIsLoading(true)
-
-      // await sleep(2000)
-      const email = values.email;
-      const password = values.password;
 
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -74,12 +72,11 @@ const page = () => {
         setError(data.message)
         setIsLoading(false)
       }
-      
+
+      router.push('/yirifi/dashboard')
 
       // Set loading state to false
       setIsLoading(false)
-
-      router.push('/yirifi/dashboard')
       
     } catch (error) {
       console.log('Something went wrong during login!')
