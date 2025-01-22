@@ -23,7 +23,7 @@ export async function POST(req: Request){
             return new Response(JSON.stringify({message: 'All User fields are required!'}))
         }
 
-        // Check if user exists
+        // Check if user exists in database
         const userAlreadyExists = await prisma.user.findFirst({
             where : {
                 email : user.email
