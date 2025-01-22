@@ -54,12 +54,16 @@ export default function Home() {
                 Smart, efficient recruitment powered by artificial intelligence. Analyze profiles, screen resumes, and make better hiring decisions with our advanced AI tools.
               </p>
               <div className="flex space-x-4">
+                <Link href={`/register/company`}>
                 <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-medium transition-colors flex items-center">
                   Get Started <ChevronRightIcon className="ml-2 h-5 w-5" />
                 </button>
+                </Link>
+                <Link href={`/auth/login`}>
                 <button className="border border-green-600 text-green-600 hover:bg-green-50 px-8 py-3 rounded-full font-medium transition-colors">
-                  Watch Demo
+                  Sign In
                 </button>
+                </Link>
               </div>
             </div>
             <div className="relative">
