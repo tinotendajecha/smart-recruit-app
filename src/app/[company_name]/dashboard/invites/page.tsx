@@ -18,7 +18,7 @@ export default function InvitesPage() {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedRole, setSelectedRole] = useState('all');
 
-  // Mock data - replace with your actual data
+  // Mock data - replace with your actual dataa
   const invites = [
     {
       id: 1,
