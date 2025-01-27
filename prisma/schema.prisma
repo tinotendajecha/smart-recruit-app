@@ -21,6 +21,61 @@ model User {
   surname String
   password String
   role   String
+  job Job? @relation(fields: [job_id], references: [id])
+  job_id String?
+  city String?
+  country String?
+  profile_img_url String?
+  phone String?
+  bio String?
+  skills String?
+  linkedin String?
+  github String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Company_User Company_User[]
+}
+
+model Company{
+  id String @id @default(uuid())
+  company_name String
+  organization_size String
+  country String
+  city String
+  services_provided String
+  company_website String
+  Company_User Company_User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Company_User{
+  id String @id @default(uuid())
+  company Company @relation(fields: [company_id], references: [id])
+  company_id String 
+  user User @relation(fields: [user_id], references: [id])
+  user_id String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Job{
+  id String      @id @default(uuid())
+  title String
+  department String
+  employment_type String
+  location String
+  description String
+  description_list String[]
+  requirements String
+  requirements_list String[]
+  compensation_minimum String
+  compensation_maximum String
+  benefits_desc String
+  benefits_list String[]
+  status String
+  User User[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

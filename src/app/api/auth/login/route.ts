@@ -20,7 +20,12 @@ export async function POST(req: Request) {
       where: {
         email: user.email,
       },
+      include: {
+        Company_User: true
+      }
     });
+
+    // console.log(emailExists)
 
     if (!emailExists) {
       return new Response(
@@ -61,7 +66,17 @@ export async function POST(req: Request) {
       path: '/'
     })
 
-    return new Response(JSON.stringify({ message: "Auth Success!" }), {
+    // Return company info
+    const company_id = emailExists.Company_User[0].company_id
+
+    // Query the companies table and return the company info
+    const company_data = await prisma.company.findFirst({
+      where: {
+        id: company_id
+      }
+    })
+
+    return new Response(JSON.stringify({ message: "Auth Success!", company_data }), {
       headers: {
         "Set-Cookie" : cookie
       },

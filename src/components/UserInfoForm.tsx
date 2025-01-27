@@ -1,4 +1,5 @@
-import React from "react";
+'use client'
+import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -12,6 +13,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useFormStore } from "@/zustand/companyFormStore";
+import { Loading } from "./ui/loading";
+import sleep from "@/utils/sleep";
+import { useRouter } from "next/navigation";
 
 interface UserInfoFormProps {
   statement: string;
@@ -19,6 +24,24 @@ interface UserInfoFormProps {
 }
 
 const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
+
+  const router = useRouter()
+
+  const [ isLoading, setIsLoading ] = useState(false)
+  const [ isSuccess, setIsSuccess ] = useState(false)
+  const [isError, setIsError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const {
+    cityLocation,
+    companyName,
+    companyWebsite,
+    countryLocation,
+    organizationSize,
+    servicesProvided,
+    resetFormStore,
+  } = useFormStore();
+
   // Keeping the existing schema and validation
   const formSchema = z
     .object({
@@ -33,7 +56,7 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
         .email({ message: "Please enter a valid email address." }),
       password: z
         .string()
-        .min(6, { message: "Password must be at least 6 characters long." }),
+        .min(8, { message: "Password must be at least 6 characters long." }),
       confirmPassword: z.string(),
       role: z.string(),
     })
@@ -50,11 +73,18 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
       email: "",
       password: "",
       confirmPassword: "",
-      role: "Admin"
+      role: role
     },
   });
+  
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+
+    // Replace spaces with underscores on company name
+
+    let modified_company_name = companyName.replaceAll(" ", "-").toLowerCase()
+    // modified_company_name = modified_company_name.toLowerCase()
+    
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: {
@@ -65,14 +95,54 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
         surname: values.surname,
         email: values.email,
         password: values.password,
-        role: values.role
+        role: values.role,
+        // Append company data here as well
+        cityLocation,
+        companyName:modified_company_name,
+        companyWebsite,
+        countryLocation,
+        organizationSize,
+        servicesProvided,
       }),
     });
 
+    // Start loading
+    setIsLoading(true)
+
+
+    if(response.status == 200){
+      setIsLoading(false)
+      setIsSuccess(true)
+      await sleep(2000)
+      setIsSuccess(false)
+      router.push('/auth/login')
+    }
+
     const data = await response.json();
     console.log(data);
-    alert("Form submitted successfully!");
+
+    if(response.status == 401){
+      setIsLoading(false)
+      setIsError(true)
+      setErrorMessage(data.message)
+    }
   };
+
+  if(isLoading){
+    return(
+      <div className="flex justify-center items-center screen-h mt-40">
+        <Loading text='Registering you, please sit tight😎...' />
+      </div>
+    )
+  }
+
+  if(isSuccess){
+    return(
+      <div className="flex justify-center items-center screen-h mt-40">
+        <Loading text='Success🙃, Redirecting you to login...' />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -109,6 +179,7 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
       {/* Right side - Form */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-white">
         <div className="w-full max-w-md">
+          
           <Form {...form}>
             <div className="flex flex-col mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -118,6 +189,13 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
                 {statement}
               </p>
             </div>
+
+            {/* Error Message */}
+          {errorMessage && (
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
+                <p>{errorMessage}</p>
+              </div>
+            )}
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Name Field */}

@@ -14,8 +14,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useFormStore } from "@/zustand/companyFormStore";
+import { useRouter } from "next/navigation";
 
 const page = () => {
+  
+  // Instantiate zustand state 
+  const setFormStore = useFormStore((state) => state.setFormStore)
+
+  const router  = useRouter()
+
   const formSchema = z.object({
     companyName: z
       .string()
@@ -42,6 +50,12 @@ const page = () => {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
+
+    // Set state to Zustand
+    setFormStore(values)
+
+    // navigate to next page
+    router.push('/register/admin-user')
   };
 
   return (
@@ -183,11 +197,14 @@ const page = () => {
                 />
               </div>
 
-              <Link href="/register/admin-user" className="block">
-                <Button className="w-full h-11 bg-green-600 hover:bg-green-500 transition-colors duration-300">
+              {/* <Link href="/register/admin-user" className="block"> */}
+                <Button 
+                className="w-full h-11 bg-green-600 hover:bg-green-500 transition-colors duration-300"
+                //  onClick={onSubmit}
+                 >
                   Next
                 </Button>
-              </Link>
+              {/* </Link> */}
             </form>
           </Form>
         </div>

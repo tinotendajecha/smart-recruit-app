@@ -43,10 +43,6 @@ const page = () => {
     },
   });
 
-  function sleep(ms:number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const email = values.email;
@@ -68,12 +64,19 @@ const page = () => {
 
       const data = await response.json();
 
+      const company_name = data.company_data.company_name
+
       if (response.status === 401){
         setError(data.message)
         setIsLoading(false)
       }
 
-      router.push('/yirifi/dashboard')
+      // Push user to their company dashboard
+      if(company_name){
+        router.push(`/${company_name}/dashboard`)
+      }else{
+        router.push('candidate/dashboard')
+      }
 
       // Set loading state to false
       setIsLoading(false)
@@ -163,7 +166,7 @@ const page = () => {
 
               <p className="text-center text-gray-600">
                 Don't have an account?{" "}
-                <a href="/auth/register" className="text-green-600 hover:text-green-500">
+                <a href="/register/company" className="text-green-600 hover:text-green-500">
                   Sign up
                 </a>
               </p>
