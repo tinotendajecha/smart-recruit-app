@@ -54,7 +54,7 @@ const page = () => {
     // Set state to Zustand
     setFormStore(values)
 
-    // navigate to next page
+    // navigate to next pagee
     router.push('/register/user')
   };
 
