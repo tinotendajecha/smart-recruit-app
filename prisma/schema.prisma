@@ -31,6 +31,7 @@ model User {
   skills String?
   linkedin String?
   github String?
+  isEmailVerified Boolean?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Company_User Company_User[]
@@ -76,6 +77,15 @@ model Job{
   benefits_list String[]
   status String
   User User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Verification_Codes{
+  id String @id @default(uuid())
+  code String
+  email String
+  expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

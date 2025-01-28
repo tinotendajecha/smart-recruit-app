@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,20 +17,23 @@ import { useFormStore } from "@/zustand/companyFormStore";
 import { Loading } from "./ui/loading";
 import sleep from "@/utils/sleep";
 import { useRouter } from "next/navigation";
+import { useEmailVerificationStore } from "@/zustand/emailVerificationStore";
+import { useQuestionnaireStore } from "@/zustand/questionnaireStore";
 
 interface UserInfoFormProps {
-  statement: string;
   role: string;
 }
 
-const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
+const UserInfoForm = () => {
+  const router = useRouter();
 
-  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const [ isLoading, setIsLoading ] = useState(false)
-  const [ isSuccess, setIsSuccess ] = useState(false)
-  const [isError, setIsError] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
+  const { purpose, source, resetQuestionnaireStore } = useQuestionnaireStore()
+  // const { resetFormStore } = useFormStore()
 
   const {
     cityLocation,
@@ -41,6 +44,8 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
     servicesProvided,
     resetFormStore,
   } = useFormStore();
+
+  const { setEmailForVerification } = useEmailVerificationStore();
 
   // Keeping the existing schema and validation
   const formSchema = z
@@ -58,7 +63,6 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
         .string()
         .min(8, { message: "Password must be at least 6 characters long." }),
       confirmPassword: z.string(),
-      role: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: "Passwords do not match.",
@@ -72,19 +76,51 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
       surname: "",
       email: "",
       password: "",
-      confirmPassword: "",
-      role: role
+      confirmPassword: ""
     },
   });
-  
+
+  const sendVerificationCode = async (email: string) => {
+    try {
+
+      // get the email from localstorage - zustand store
+      if (email) {
+        // if email exists - POST generated code and email to verification table
+
+        const response = await fetch("/api/auth/generate-code", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email
+          }),
+        });
+
+        // After generating passcode
+        console.log(response);
+        return response
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // Start loading
+    setIsLoading(true);
 
     // Replace spaces with underscores on company name
+    let modified_company_name = companyName.replaceAll(" ", "-").toLowerCase();
 
-    let modified_company_name = companyName.replaceAll(" ", "-").toLowerCase()
-    // modified_company_name = modified_company_name.toLowerCase()
-    
+    let userRole = null
+
+    if(purpose == 'I am a recruiter'){
+      userRole = 'Admin'
+    }else{
+      userRole = 'Candidate'
+    }
+
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: {
@@ -95,10 +131,10 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
         surname: values.surname,
         email: values.email,
         password: values.password,
-        role: values.role,
+        role: userRole,
         // Append company data here as well
         cityLocation,
-        companyName:modified_company_name,
+        companyName: modified_company_name,
         companyWebsite,
         countryLocation,
         organizationSize,
@@ -106,42 +142,49 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
       }),
     });
 
-    // Start loading
-    setIsLoading(true)
+    // call verification code func
+    const emailVerificationResponse = await sendVerificationCode(values.email)
 
+    if (response.status == 200 && emailVerificationResponse?.status == 200) {
+      setIsLoading(false);
+      setIsSuccess(true);
+      setIsSuccess(false);
 
-    if(response.status == 200){
-      setIsLoading(false)
-      setIsSuccess(true)
-      await sleep(2000)
-      setIsSuccess(false)
-      router.push('/auth/login')
+      // Set the email in global variable for later email verification
+      setEmailForVerification(values.email);
+
+      // Reset stores at this point
+      resetFormStore()
+      resetQuestionnaireStore()
+
+      // navigate to email verification page
+      router.push("/auth/email-verification");
     }
 
     const data = await response.json();
     console.log(data);
 
-    if(response.status == 401){
-      setIsLoading(false)
-      setIsError(true)
-      setErrorMessage(data.message)
+    if (response.status == 401) {
+      setIsLoading(false);
+      setIsError(true);
+      setErrorMessage(data.message);
     }
   };
 
-  if(isLoading){
-    return(
+  if (isLoading) {
+    return (
       <div className="flex justify-center items-center screen-h mt-40">
-        <Loading text='Registering you, please sit tight😎...' />
+        <Loading text="Registering you, please sit tight😎..." />
       </div>
-    )
+    );
   }
 
-  if(isSuccess){
-    return(
+  if (isSuccess) {
+    return (
       <div className="flex justify-center items-center screen-h mt-40">
-        <Loading text='Success🙃, Redirecting you to login...' />
+        <Loading text="Success🙃, Redirecting you to login..." />
       </div>
-    )
+    );
   }
 
   return (
@@ -156,21 +199,41 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <circle cx="250" cy="250" r="200" fill="#16a34a" fillOpacity="0.1" />
-            <circle cx="250" cy="250" r="150" fill="#16a34a" fillOpacity="0.2" />
-            <circle cx="250" cy="250" r="100" fill="#16a34a" fillOpacity="0.3" />
+            <circle
+              cx="250"
+              cy="250"
+              r="200"
+              fill="#16a34a"
+              fillOpacity="0.1"
+            />
+            <circle
+              cx="250"
+              cy="250"
+              r="150"
+              fill="#16a34a"
+              fillOpacity="0.2"
+            />
+            <circle
+              cx="250"
+              cy="250"
+              r="100"
+              fill="#16a34a"
+              fillOpacity="0.3"
+            />
             <path
               d="M250 150 L350 250 L250 350 L150 250 Z"
               fill="#16a34a"
               fillOpacity="0.4"
             />
           </svg>
-          
+
           <div className="mt-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-800">Join Our Community</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Join Our Community
+            </h2>
             <p className="mt-2 text-gray-600">
-              Create an account and start your journey with us. Access all our features
-              and connect with other professionals.
+              Create an account and start your journey with us. Access all our
+              features and connect with other professionals.
             </p>
           </div>
         </div>
@@ -179,19 +242,16 @@ const UserInfoForm = ({ statement, role }: UserInfoFormProps) => {
       {/* Right side - Form */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-white">
         <div className="w-full max-w-md">
-          
           <Form {...form}>
             <div className="flex flex-col mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Create Account
               </h1>
-              <p className="text-gray-600">
-                {statement}
-              </p>
+              <p className="text-gray-600">Please fill in all fields</p>
             </div>
 
             {/* Error Message */}
-          {errorMessage && (
+            {errorMessage && (
               <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
                 <p>{errorMessage}</p>
               </div>

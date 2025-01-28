@@ -166,7 +166,7 @@ const page = () => {
 
               <p className="text-center text-gray-600">
                 Don't have an account?{" "}
-                <a href="/register/company" className="text-green-600 hover:text-green-500">
+                <a href="/register/questionnaire" className="text-green-600 hover:text-green-500">
                   Sign up
                 </a>
               </p>

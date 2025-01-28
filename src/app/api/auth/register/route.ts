@@ -38,7 +38,7 @@ export async function POST(req: Request){
         })
 
         if (userAlreadyExists){
-            return new Response(JSON.stringify({message: 'User Aleady exists!'}),{status: 401})
+            return new Response(JSON.stringify({message: 'User Already exists!'}),{status: 401})
         }
 
         // Now hash the password

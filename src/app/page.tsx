@@ -54,7 +54,7 @@ export default function Home() {
                 Smart, efficient recruitment powered by artificial intelligence. Analyze profiles, screen resumes, and make better hiring decisions with our advanced AI tools.
               </p>
               <div className="flex space-x-4">
-                <Link href={`/register/company`}>
+                <Link href={`/register/questionnaire`}>
                 <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-medium transition-colors flex items-center">
                   Get Started <ChevronRightIcon className="ml-2 h-5 w-5" />
                 </button>
@@ -135,7 +135,7 @@ export default function Home() {
           <p className="text-green-100 mb-8 max-w-2xl mx-auto">
             Join thousands of companies using SmartRecruit to hire better, faster, and smarter.
           </p>
-          <Link href="/register-company">
+          <Link href="/register/questionnaire">
             <button className="bg-white text-green-600 px-8 py-3 rounded-full font-medium hover:bg-green-50 transition-colors">
               Start Free Trial
             </button>

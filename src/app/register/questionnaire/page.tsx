@@ -1,10 +1,16 @@
 'use client'
 import React, { useState } from 'react';
 import { CircleDot, Linkedin, Twitter, Smile, Globe } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useQuestionnaireStore } from '@/zustand/questionnaireStore';
 
 function App() {
   const [selectedPurpose, setSelectedPurpose] = useState<string | null>(null);
   const [selectedSource, setSelectedSource] = useState<string | null>(null);
+
+  const { setQuestionnaireAnswers } = useQuestionnaireStore()
+
+  const router = useRouter()
 
   const handleNextPage = () => {
     if (!selectedPurpose || !selectedSource) {
@@ -17,7 +23,15 @@ function App() {
       purpose: selectedPurpose,
       source: selectedSource
     };
-    console.log('User selections:', userSelections);
+    
+    // Set answers to global store
+    setQuestionnaireAnswers(userSelections)
+
+    if(userSelections.purpose == 'I am a recruiter'){
+      router.push('/register/company')
+    }else{
+      router.push('/register/user')
+    }
   };
 
   return (

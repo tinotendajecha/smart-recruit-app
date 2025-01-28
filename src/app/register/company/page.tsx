@@ -55,7 +55,7 @@ const page = () => {
     setFormStore(values)
 
     // navigate to next page
-    router.push('/register/admin-user')
+    router.push('/register/user')
   };
 
   return (
