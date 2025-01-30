@@ -1,6 +1,6 @@
 'use client';
 
-import { FileText, Linkedin, ChevronRight, BarChart3, User, Building } from 'lucide-react';
+import { FileText, Linkedin, ChevronRight, BarChart3, User, Building, Search, ChevronLeft, ChevronDown } from 'lucide-react';
 
 export default function ApplicationsPage() {
   const applications = [
@@ -39,28 +39,42 @@ export default function ApplicationsPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-        <h1 className="text-2xl font-semibold mb-6">Applications</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <h1 className="text-2xl font-semibold">Applications</h1>
+          
+          {/* Search Bar */}
+          <div className="relative w-full sm:w-72">
+            <input
+              type="text"
+              placeholder="Search candidates..."
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+          </div>
+        </div>
         
-        {/* Filters - Responsive */}
+        {/* Enhanced Filters - Responsive */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex items-center border rounded-lg px-3 py-2 w-full sm:w-auto">
+          <div className="relative flex items-center border rounded-lg px-3 py-2 w-full sm:w-48 hover:border-gray-400 transition-colors">
             <Building className="w-4 h-4 mr-2 text-gray-500" />
-            <select className="bg-transparent focus:outline-none w-full">
+            <select className="appearance-none bg-transparent focus:outline-none w-full pr-8">
               <option>All Jobs</option>
               <option>Senior Developer</option>
               <option>Product Manager</option>
               <option>UI/UX Designer</option>
             </select>
+            <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3" />
           </div>
-          <div className="flex items-center border rounded-lg px-3 py-2 w-full sm:w-auto">
+          <div className="relative flex items-center border rounded-lg px-3 py-2 w-full sm:w-48 hover:border-gray-400 transition-colors">
             <BarChart3 className="w-4 h-4 mr-2 text-gray-500" />
-            <select className="bg-transparent focus:outline-none w-full">
+            <select className="appearance-none bg-transparent focus:outline-none w-full pr-8">
               <option>All Stages</option>
               <option>Applied</option>
               <option>Screening</option>
               <option>Interview</option>
               <option>Offer</option>
             </select>
+            <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3" />
           </div>
         </div>
 
@@ -175,6 +189,24 @@ export default function ApplicationsPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Pagination */}
+        <div className="mt-6 flex items-center justify-between border-t pt-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Showing 1-3 of 12 results</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg bg-blue-50 text-blue-600 font-medium">1</button>
+            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50">2</button>
+            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50">3</button>
+            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

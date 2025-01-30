@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, Building, MapPin, Clock, CheckCircle2, XCircle, Timer, FileText } from 'lucide-react';
+import { ChevronRight, Building, MapPin, Clock, CheckCircle2, XCircle, Timer, FileText, ChevronLeft } from 'lucide-react';
 
 export default function MyApplicationsPage() {
   const applications = [
@@ -146,6 +146,34 @@ export default function MyApplicationsPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Pagination */}
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t pt-6">
+          <div className="text-sm text-gray-600">
+            Showing <span className="font-medium">1</span> to <span className="font-medium">3</span> of{' '}
+            <span className="font-medium">8</span> applications
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              className="inline-flex items-center justify-center w-9 h-9 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
+              disabled
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button className="inline-flex items-center justify-center w-9 h-9 border rounded-lg bg-blue-50 text-blue-600 font-medium">
+              1
+            </button>
+            <button className="inline-flex items-center justify-center w-9 h-9 border rounded-lg hover:bg-gray-50">
+              2
+            </button>
+            <button className="inline-flex items-center justify-center w-9 h-9 border rounded-lg hover:bg-gray-50">
+              3
+            </button>
+            <button className="inline-flex items-center justify-center w-9 h-9 border rounded-lg hover:bg-gray-50">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

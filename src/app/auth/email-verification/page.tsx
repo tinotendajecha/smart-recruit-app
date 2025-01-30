@@ -11,8 +11,9 @@ function App() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes in seconds
   const [canResend, setCanResend] = useState(false);
+  const [isResendingCode, setResendingCode] = useState(false)
 
   const [isSuccess, setIsSuccess] = useState<boolean | null>(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -157,7 +158,9 @@ function App() {
   const handleResendCode = async () => {
     if (!canResend && timeLeft > 0) return;
     
-    setIsLoading(true);
+    // setIsLoading(true);
+    setResendingCode(true)
+
     try {
     // call verification code func
     const emailVerificationResponse = await sendVerificationCode(email)
@@ -169,10 +172,10 @@ function App() {
     }
 
 
-      setTimeLeft(600); // Reset timer to 10 minutes
+      setTimeLeft(180); // Reset timer to 10 minutes
       setCanResend(false);
     } finally {
-      setIsLoading(false);
+      setResendingCode(false);
     }
   };
 
@@ -183,6 +186,15 @@ function App() {
         </div>
       );
     }
+
+    if (isResendingCode) {
+      return (
+        <div className="flex justify-center items-center screen-h mt-40">
+          <Loading text="Resending verification code 😎..." />
+        </div>
+      );
+    }
+
 
     if (isSuccess) {
       return (
@@ -247,7 +259,7 @@ function App() {
               </div>
             )}
             {successMessage && (
-              <div className="bg-red-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 mt-5">
+              <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 mt-5">
                 <p>{successMessage}</p>
               </div>
             )}

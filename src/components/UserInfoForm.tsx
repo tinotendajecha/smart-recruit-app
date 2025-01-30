@@ -98,7 +98,7 @@ const UserInfoForm = () => {
         });
 
         // After generating passcode
-        console.log(response);
+        // console.log(response);
         return response
       }
     } catch (error) {
@@ -146,10 +146,8 @@ const UserInfoForm = () => {
     const emailVerificationResponse = await sendVerificationCode(values.email)
 
     if (response.status == 200 && emailVerificationResponse?.status == 200) {
-      setIsLoading(false);
       setIsSuccess(true);
-      setIsSuccess(false);
-
+      
       // Set the email in global variable for later email verification
       setEmailForVerification(values.email);
 
@@ -159,10 +157,11 @@ const UserInfoForm = () => {
 
       // navigate to email verification page
       router.push("/auth/email-verification");
+      setIsLoading(false);
+      setIsSuccess(false);
     }
 
     const data = await response.json();
-    console.log(data);
 
     if (response.status == 401) {
       setIsLoading(false);

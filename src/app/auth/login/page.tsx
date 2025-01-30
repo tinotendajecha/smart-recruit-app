@@ -22,7 +22,7 @@ import { LoadingDots, LoadingBar, Loading } from "@/components/ui/loading";
 const page = () => {
 
   const [loading, setIsLoading] = useState(false)
-  const[error, setError] = useState(null)
+  const[error, setError] = useState<string | null>(null)
 
   useEffect(() => {
 
@@ -31,7 +31,7 @@ const page = () => {
   const router = useRouter();
 
   const formSchema = z.object({
-    email: z.string().email({ message: "Please enter a valid email address." }),
+    email: z.string().email({ message: "Please enter a valid email address!" }),
     password: z.string(),
   });
 
@@ -64,9 +64,14 @@ const page = () => {
 
       const data = await response.json();
 
-      const company_name = data.company_data.company_name
+      let company_name = null;
 
-      if (response.status === 401){
+
+      if (data.userData.role == 'Admin'){
+        company_name = data.company_data.company_name
+      }
+      
+      if (response.status == 401){
         setError(data.message)
         setIsLoading(false)
       }
@@ -75,7 +80,7 @@ const page = () => {
       if(company_name){
         router.push(`/${company_name}/dashboard`)
       }else{
-        router.push('candidate/dashboard')
+        router.push('/candidate/dashboard')
       }
 
       // Set loading state to false
@@ -83,6 +88,8 @@ const page = () => {
       
     } catch (error) {
       console.log('Something went wrong during login!')
+      setError('Something went wrong during login, try again please!')
+      setIsLoading(false)
     }
   };
 

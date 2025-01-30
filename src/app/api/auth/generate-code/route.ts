@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     // Set the expiry time to 10 minutes from now
     const now = new Date();
-    const expiryTime = new Date(now.getTime() + 10 * 60 * 1000); // Add 10 minutes
+    const expiryTime = new Date(now.getTime() + 3 * 60 * 1000); // Add 10 minutes
 
     console.log("Expiry Time:", expiryTime);
 
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
                       </div>
                       
                       <p style="margin: 0 0 10px; color: #4b5563; line-height: 24px;">
-                        This code will expire in 10 minutes for security purposes.
+                        This code will expire in 3 minutes for security purposes.
                       </p>
                       <p style="margin: 0; color: #6b7280; font-size: 14px;">
                         If you didn't request this verification code, please ignore this email.
