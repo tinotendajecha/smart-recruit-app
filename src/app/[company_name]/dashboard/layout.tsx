@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 import { useParams } from "next/navigation";
+import { useUserStore } from "@/zustand/userDataStore";
 
 // import { useRouter } from "next/router";
 import MobileMenu from "@/components/MobileMenu";
@@ -35,6 +36,8 @@ export default function DashboardLayout({
 
   // const router = useRouter()
   const { company_name } = useParams();
+
+  const { user } = useUserStore();
 
   const navItems = [
     {
@@ -141,7 +144,7 @@ export default function DashboardLayout({
                 </button>
                 <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
                   <img
-                    src="https://ui-avatars.com/api/?name=Admin+User"
+                    src={`https://ui-avatars.com/api/?name=${user.name}+${user.surname}`}
                     alt="Profile"
                     className="w-8 h-8 rounded-full"
                   />
@@ -201,7 +204,7 @@ export default function DashboardLayout({
               <Link href={`/${company_name}/dashboard/my-profile`}>
               <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
                 <img
-                  src="https://ui-avatars.com/api/?name=Admin+User"
+                  src={`https://ui-avatars.com/api/?name=${user.name}+${user.surname}`}
                   alt="Profile"
                   className="w-8 h-8 rounded-full"
                 />

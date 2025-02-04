@@ -18,11 +18,14 @@ import { useRouter } from "next/navigation";
 
 import { useState,useEffect } from "react";
 import { LoadingDots, LoadingBar, Loading } from "@/components/ui/loading";
+import { useUserStore } from "@/zustand/userDataStore";
 
 const page = () => {
 
   const [loading, setIsLoading] = useState(false)
   const[error, setError] = useState<string | null>(null)
+
+  const { setUserData } = useUserStore()
 
   useEffect(() => {
 
@@ -66,9 +69,12 @@ const page = () => {
 
       let company_name = null;
 
+      // set user data to local storage
+      setUserData(data.userData)
+
 
       if (data.userData.role == 'Admin'){
-        company_name = data.company_data.company_name
+        company_name = data.companyData.company_name
       }
       
       if (response.status == 401){
@@ -89,6 +95,7 @@ const page = () => {
     } catch (error) {
       console.log('Something went wrong during login!')
       setError('Something went wrong during login, try again please!')
+      console.log(error)
       setIsLoading(false)
     }
   };

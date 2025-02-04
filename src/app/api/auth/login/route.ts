@@ -75,14 +75,14 @@ export async function POST(req: Request) {
       const company_id = userData.Company_User[0].company_id;
 
       // Query the companies table and return the company info
-      const company_data = await prisma.company.findFirst({
+      const companyData = await prisma.company.findFirst({
         where: {
           id: company_id,
         },
       });
 
       return new Response(
-        JSON.stringify({ message: "Auth Success!", userData ,company_data }),
+        JSON.stringify({ message: "Auth Success!", userData ,companyData }),
         {
           headers: {
             "Set-Cookie": cookie,
