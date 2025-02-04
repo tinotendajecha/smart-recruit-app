@@ -25,11 +25,17 @@ interface TagInputProps {
 const TagInput = ({ tags, setTags, placeholder }: TagInputProps) => {
   const [input, setInput] = useState('');
 
+  const addTag = () => {
+    if (input.trim()) {
+      setTags([...tags, input.trim()]);
+      setInput('');
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && input.trim()) {
       e.preventDefault();
-      setTags([...tags, input.trim()]);
-      setInput('');
+      addTag();
     }
   };
 
@@ -56,14 +62,27 @@ const TagInput = ({ tags, setTags, placeholder }: TagInputProps) => {
           </span>
         ))}
       </div>
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-        placeholder={placeholder}
-      />
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          placeholder={placeholder}
+        />
+        <button
+          type="button"
+          onClick={addTag}
+          disabled={!input.trim()}
+          className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
+      </div>
+      <p className="mt-1 text-sm text-gray-500">
+        Press Enter or click + to add
+      </p>
     </div>
   );
 };
