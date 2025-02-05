@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { z } from 'zod';
 import { 
   Briefcase, 
   Building, 
@@ -13,16 +14,48 @@ import {
   Save,
   Upload,
   X,
-  Plus
+  Plus,
+  AlertCircle
 } from 'lucide-react';
+
+// Define Zod schema for form validation
+const jobFormSchema = z.object({
+  title: z.string().min(1, 'Job title is required'),
+  department: z.string().min(1, 'Department is required'),
+  employment_type: z.string().min(1, 'Employment type is required'),
+  location: z.string().min(1, 'Location is required'),
+  description: z.string().min(1, 'Description is required'),
+  description_list: z.array(z.string()).min(1, 'At least one responsibility is required'),
+  requirements: z.string().min(1, 'Requirements are required'),
+  requirements_list: z.array(z.string()).min(1, 'At least one specific requirement is required'),
+  compensation_minimum: z.string().min(1, 'Minimum compensation is required'),
+  compensation_maximum: z.string().min(1, 'Maximum compensation is required'),
+  benefits_desc: z.string().min(1, 'Benefits description is required'),
+  benefits_list: z.array(z.string()).min(1, 'At least one benefit is required'),
+  status: z.enum(['draft', 'published'])
+}).refine((data) => {
+  const min = Number(data.compensation_minimum);
+  const max = Number(data.compensation_maximum);
+  return min <= max;
+}, {
+  message: "Maximum compensation must be greater than or equal to minimum compensation",
+  path: ["compensation_maximum"]
+});
+
+type JobFormData = z.infer<typeof jobFormSchema>;
+
+interface ValidationErrors {
+  [key: string]: string[];
+}
 
 interface TagInputProps {
   tags: string[];
   setTags: (tags: string[]) => void;
   placeholder: string;
+  error?: string;
 }
 
-const TagInput = ({ tags, setTags, placeholder }: TagInputProps) => {
+const TagInput = ({ tags, setTags, placeholder, error }: TagInputProps) => {
   const [input, setInput] = useState('');
 
   const addTag = () => {
@@ -68,7 +101,9 @@ const TagInput = ({ tags, setTags, placeholder }: TagInputProps) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+            error ? 'border-red-500' : ''
+          }`}
           placeholder={placeholder}
         />
         <button
@@ -80,6 +115,12 @@ const TagInput = ({ tags, setTags, placeholder }: TagInputProps) => {
           <Plus className="w-5 h-5" />
         </button>
       </div>
+      {error && (
+        <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+          <AlertCircle className="w-4 h-4" />
+          {error}
+        </p>
+      )}
       <p className="mt-1 text-sm text-gray-500">
         Press Enter or click + to add
       </p>
@@ -88,21 +129,23 @@ const TagInput = ({ tags, setTags, placeholder }: TagInputProps) => {
 };
 
 export default function CreateJobPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<JobFormData>({
     title: '',
     department: '',
     employment_type: '',
     location: '',
     description: '',
-    description_list: [] as string[],
+    description_list: [],
     requirements: '',
-    requirements_list: [] as string[],
+    requirements_list: [],
     compensation_minimum: '',
     compensation_maximum: '',
     benefits_desc: '',
-    benefits_list: [] as string[],
+    benefits_list: [],
     status: 'draft'
   });
+
+  const [errors, setErrors] = useState<ValidationErrors>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -110,11 +153,58 @@ export default function CreateJobPage() {
       ...prev,
       [name]: value
     }));
+    // Clear error when field is modified
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
   
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+    
+    try {
+      // Validate form data
+      const jobData = jobFormSchema.parse(formData);
+      
+      // If validation passes, clear errors and submit
+      setErrors({});
+      // console.log('Form data is valid:', jobData);
+      
+      // Here you would typically make an API call to save the data
+      const response = await fetch('/api/jobs/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jobData)
+      })
+
+      const data = await response.json()
+
+      console.log(data)
+      
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Convert Zod errors to our error format
+        const validationErrors: ValidationErrors = {};
+        error.errors.forEach((err) => {
+          const path = err.path.join('.');
+          if (!validationErrors[path]) {
+            validationErrors[path] = [];
+          }
+          validationErrors[path].push(err.message);
+        });
+        setErrors(validationErrors);
+        
+        // Scroll to the first error
+        const firstErrorField = document.querySelector('[aria-invalid="true"]');
+        firstErrorField?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
   };
 
   const updateList = (field: 'description_list' | 'requirements_list' | 'benefits_list', newList: string[]) => {
@@ -122,6 +212,18 @@ export default function CreateJobPage() {
       ...prev,
       [field]: newList
     }));
+    // Clear error when list is modified
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  const getFieldError = (fieldName: string) => {
+    return errors[fieldName]?.[0];
   };
 
   return (
@@ -150,26 +252,38 @@ export default function CreateJobPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Job Title
+                  Job Title *
                 </label>
                 <input
                   type="text"
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                    getFieldError('title') ? 'border-red-500' : ''
+                  }`}
                   placeholder="e.g., Senior Software Engineer"
+                  aria-invalid={!!getFieldError('title')}
                 />
+                {getFieldError('title') && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {getFieldError('title')}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Department
+                  Department *
                 </label>
                 <select
                   name="department"
                   value={formData.department}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                    getFieldError('department') ? 'border-red-500' : ''
+                  }`}
+                  aria-invalid={!!getFieldError('department')}
                 >
                   <option value="">Select Department</option>
                   <option value="engineering">Engineering</option>
@@ -177,26 +291,41 @@ export default function CreateJobPage() {
                   <option value="product">Product</option>
                   <option value="marketing">Marketing</option>
                 </select>
+                {getFieldError('department') && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {getFieldError('department')}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Employment Type
+                  Employment Type *
                 </label>
                 <select
                   name="employment_type"
                   value={formData.employment_type}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                    getFieldError('employment_type') ? 'border-red-500' : ''
+                  }`}
+                  aria-invalid={!!getFieldError('employment_type')}
                 >
                   <option value="">Select Type</option>
                   <option value="full-time">Full-time</option>
                   <option value="part-time">Part-time</option>
                   <option value="contract">Contract</option>
                 </select>
+                {getFieldError('employment_type') && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {getFieldError('employment_type')}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
+                  Location *
                 </label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -205,10 +334,19 @@ export default function CreateJobPage() {
                     name="location"
                     value={formData.location}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                      getFieldError('location') ? 'border-red-500' : ''
+                    }`}
                     placeholder="e.g., Remote, New York, London"
+                    aria-invalid={!!getFieldError('location')}
                   />
                 </div>
+                {getFieldError('location') && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {getFieldError('location')}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -219,44 +357,64 @@ export default function CreateJobPage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
+                  Description *
                 </label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 mb-3"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 mb-3 ${
+                    getFieldError('description') ? 'border-red-500' : ''
+                  }`}
                   placeholder="Main job description..."
+                  aria-invalid={!!getFieldError('description')}
                 />
+                {getFieldError('description') && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {getFieldError('description')}
+                  </p>
+                )}
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Key Responsibilities (Press Enter to add)
+                  Key Responsibilities * (Press Enter to add)
                 </label>
                 <TagInput
                   tags={formData.description_list}
                   setTags={(newTags) => updateList('description_list', newTags)}
                   placeholder="Add a responsibility and press Enter"
+                  error={getFieldError('description_list')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Requirements
+                  Requirements *
                 </label>
                 <textarea
                   name="requirements"
                   value={formData.requirements}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 mb-3"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 mb-3 ${
+                    getFieldError('requirements') ? 'border-red-500' : ''
+                  }`}
                   placeholder="Main requirements description..."
+                  aria-invalid={!!getFieldError('requirements')}
                 />
+                {getFieldError('requirements') && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {getFieldError('requirements')}
+                  </p>
+                )}
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Specific Requirements (Press Enter to add)
+                  Specific Requirements * (Press Enter to add)
                 </label>
                 <TagInput
                   tags={formData.requirements_list}
                   setTags={(newTags) => updateList('requirements_list', newTags)}
                   placeholder="Add a requirement and press Enter"
+                  error={getFieldError('requirements_list')}
                 />
               </div>
             </div>
@@ -271,7 +429,7 @@ export default function CreateJobPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Salary Range
+                  Salary Range *
                 </label>
                 <div className="flex items-center gap-4">
                   <div className="relative flex-1">
@@ -281,8 +439,11 @@ export default function CreateJobPage() {
                       name="compensation_minimum"
                       value={formData.compensation_minimum}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                        getFieldError('compensation_minimum') ? 'border-red-500' : ''
+                      }`}
                       placeholder="Min"
+                      aria-invalid={!!getFieldError('compensation_minimum')}
                     />
                   </div>
                   <span className="text-gray-500">to</span>
@@ -293,33 +454,52 @@ export default function CreateJobPage() {
                       name="compensation_maximum"
                       value={formData.compensation_maximum}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                        getFieldError('compensation_maximum') ? 'border-red-500' : ''
+                      }`}
                       placeholder="Max"
+                      aria-invalid={!!getFieldError('compensation_maximum')}
                     />
                   </div>
                 </div>
+                {(getFieldError('compensation_minimum') || getFieldError('compensation_maximum')) && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {getFieldError('compensation_minimum') || getFieldError('compensation_maximum')}
+                  </p>
+                )}
               </div>
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Benefits Description
+                    Benefits Description *
                   </label>
                   <textarea
                     name="benefits_desc"
                     value={formData.benefits_desc}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                      getFieldError('benefits_desc') ? 'border-red-500' : ''
+                    }`}
                     placeholder="General benefits description..."
+                    aria-invalid={!!getFieldError('benefits_desc')}
                   />
+                  {getFieldError('benefits_desc') && (
+                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {getFieldError('benefits_desc')}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Benefits List (Press Enter to add)
+                    Benefits List * (Press Enter to add)
                   </label>
                   <TagInput
                     tags={formData.benefits_list}
                     setTags={(newTags) => updateList('benefits_list', newTags)}
                     placeholder="Add a benefit and press Enter"
+                    error={getFieldError('benefits_list')}
                   />
                 </div>
               </div>

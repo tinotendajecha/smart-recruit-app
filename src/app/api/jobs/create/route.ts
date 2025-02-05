@@ -1,23 +1,25 @@
 import prisma from "@/utils/dbconfig";
-import jwt from "jsonwebtoken";
-import { serialize } from "cookie";
-import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 dotenv.config();
+import { Job } from "@/types/Job";
 
-interface User {
-  email: string;
-  password: string;
-}
+
 
 export async function POST(req: Request) {
   try {
 
-    
+    // Get the user data from the request body
+    const body: Job = await req.json()
 
+    // Create the job
+    const job = await prisma.job.create({
+        data: {
+            ...body
+        }
+    })
 
-    // Just return user data
-    return new Response(JSON.stringify({ message: "Job Created!" }));
+    // Return the job data
+    return new Response(JSON.stringify({ message: "Job Created!" , job}));
 
   } catch (error) {
     console.log(error);
