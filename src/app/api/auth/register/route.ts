@@ -69,7 +69,7 @@ export async function POST(req: Request) {
           country: body.countryLocation,
           city: body.cityLocation,
           services_provided: body.servicesProvided,
-          company_website: body.companyWebsite,
+          company_website: body.companyWebsite
         },
       });
 

@@ -32,7 +32,7 @@ export default function ChatAgentPage() {
         
         {/* Upload Section */}
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 md:p-8 text-center">
-          <h3 className="text-lg font-medium mb-2">Upload Knowledge Base Documents</h3>
+          <h3 className="text-lg font-medium mb-2">Upload Knowledge Base Documents For Chat Agent</h3>
           <p className="text-gray-500 mb-4">Drop your PDF, DOCX, or TXT files here</p>
           <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 inline-flex items-center gap-2">
             <Upload className="w-5 h-5" />

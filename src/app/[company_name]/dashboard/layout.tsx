@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,7 +18,10 @@ import {
   Bot,
   FileText,
   Mail,
+  Brain,
+  Building2
 } from "lucide-react";
+import { Loading } from "@/components/ui/loading";
 
 import { useParams } from "next/navigation";
 import { useUserStore } from "@/zustand/userDataStore";
@@ -33,58 +36,96 @@ export default function DashboardLayout({
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const pathname = usePathname();
+  const [isLoading, setIsLoading] = useState(true);
 
   // const router = useRouter()
   const { company_name } = useParams();
 
+  // Load user from store
   const { user } = useUserStore();
+
+  useEffect(() => {
+    if (user.role) {
+      setIsLoading(false);
+    }
+  })
+
 
   const navItems = [
     {
       name: "Dashboard",
       icon: <LayoutDashboard className="w-5 h-5" />,
       path: `/${company_name}/dashboard`,
-    },
-    {
-      name: "Jobs",
-      icon: <Briefcase className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/jobs`,
+      role: "Both",
     },
     {
       name: "Applications",
       icon: <Users className="w-5 h-5" />,
       path: `/${company_name}/dashboard/applications`,
+      role: "Admin",
     },
     {
-      name: "Candidate Helper",
-      icon: <MessageSquare className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/chat`,
-    },
-    {
-      name: "Team",
-      icon: <UserPlus className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/team`,
-    },
-    {
-      name: "Settings",
-      icon: <Settings className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/settings`,
+      name: "Jobs",
+      icon: <Briefcase className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/jobs`,
+      role: "Admin",
     },
     {
       name: "My Applications",
       icon: <FileText className="w-5 h-5" />,
       path: `/${company_name}/dashboard/my-applications`,
+      role: "Candidate",
     },
     {
       name: "Chat Assistant",
       icon: <Bot className="w-5 h-5" />,
       path: `/${company_name}/dashboard/candidate-chat`,
-    },{
-      name: "Invite",
-      icon:<Mail className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/invites`,
+      role: "Both",
     },
+    {
+      name: "Knowledge Base",
+      icon: <Brain className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/knowledge-base`,
+      role: "Admin",
+    },
+    // {
+    //   name: "Team",
+    //   icon: <UserPlus className="w-5 h-5" />,
+    //   path: `/${company_name}/dashboard/team`,
+    //   role: 'Admin'
+    // },
+    {
+      name: "Invite",
+      icon: <Mail className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/invites`,
+      role: "Admin",
+    },
+    {
+      name: "Companies",
+      icon: <Building2 className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/companies`,
+      role: "Candidate",
+    },
+    {
+      name: "Settings",
+      icon: <Settings className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/settings`,
+      role: "Both",
+    }    
   ];
+
+  // Filter nav items based on user role
+  const filteredNavItems = navItems.filter(
+    (item) => item.role === user.role || item.role === "Both"
+  );
+
+  if(isLoading) {
+    return(
+      <div className="flex justify-center items-center h-screen">
+         <Loading />
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -102,7 +143,7 @@ export default function DashboardLayout({
         </div>
 
         <nav>
-          {navItems.map((item) => (
+          {filteredNavItems.map((item) => (
             <Link
               key={item.name}
               href={item.path}
@@ -202,14 +243,14 @@ export default function DashboardLayout({
                 <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               <Link href={`/${company_name}/dashboard/my-profile`}>
-              <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
-                <img
-                  src={`https://ui-avatars.com/api/?name=${user.name}+${user.surname}`}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full"
-                />
-                <ChevronDown className="w-4 h-4" />
-              </button>
+                <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${user.name}+${user.surname}`}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <ChevronDown className="w-4 h-4" />
+                </button>
               </Link>
             </div>
           </div>

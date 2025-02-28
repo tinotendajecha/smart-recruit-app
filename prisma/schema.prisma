@@ -15,76 +15,92 @@ datasource db {
 
 // need to come up with schema
 model User {
-  id      String      @id @default(uuid())
-  email   String   @unique
-  name    String
-  surname String
-  password String
-  role   String
-  job Job? @relation(fields: [job_id], references: [id])
-  job_id String?
-  city String?
-  country String?
+  id              String         @id @default(uuid())
+  email           String         @unique
+  name            String
+  surname         String
+  password        String
+  role            String
+  job             Job?           @relation(fields: [job_id], references: [id])
+  job_id          String?
+  city            String?
+  country         String?
   profile_img_url String?
-  phone String?
-  bio String?
-  skills String?
-  linkedin String?
-  github String?
+  phone           String?
+  bio             String?
+  skills          String?
+  linkedin        String?
+  github          String?
   isEmailVerified Boolean?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Company_User Company_User[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  Company_User    Company_User[]
 }
 
-model Company{
-  id String @id @default(uuid())
-  company_name String
+model Company {
+  id                String         @id @default(uuid())
+  company_name      String
   organization_size String
-  country String
-  city String
+  country           String
+  city              String
   services_provided String
-  company_website String
-  Company_User Company_User[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  company_website   String
+  // adding these
+  about_company     String?
+  founded           String?
+  linkedin          String?
+  Twitter           String?
+  Facebook          String?
+  company_culture   String?
+  benefits_and_perks String[]
+  email             String?
+  phone             String?
+  Address           String?
+  website           String?
+  // added these
+  Company_User      Company_User[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  Job               Job[]
 }
 
-model Company_User{
-  id String @id @default(uuid())
-  company Company @relation(fields: [company_id], references: [id])
-  company_id String 
-  user User @relation(fields: [user_id], references: [id])
-  user_id String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Company_User {
+  id         String   @id @default(uuid())
+  company    Company  @relation(fields: [company_id], references: [id])
+  company_id String
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
-
-model Job{
-  id String      @id @default(uuid())
-  title String
-  department String
-  employment_type String
-  location String
-  description String
-  description_list String[]
-  requirements String
-  requirements_list String[]
+model Job {
+  id                   String   @id @default(uuid())
+  title                String
+  department           String
+  employment_type      String
+  location             String
+  description          String
+  description_list     String[]
+  requirements         String
+  requirements_list    String[]
   compensation_minimum String
   compensation_maximum String
-  benefits_desc String
-  benefits_list String[]
-  status String
-  User User[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  benefits_desc        String
+  benefits_list        String[]
+  status               String
+  // added these
+  company              Company? @relation(fields: [company_id], references: [id])
+  company_id           String?
+  User                 User[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
 
-model Verification_Codes{
-  id String @id @default(uuid())
-  code String
-  email String
+model Verification_Codes {
+  id        String   @id @default(uuid())
+  code      String
+  email     String
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

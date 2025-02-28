@@ -1,6 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+interface Company_User{
+  id: string;
+  company_id: string;
+  user_id: string;
+  createdAt: string;
+  updatedAt: string
+}
+
 interface User {
   bio?: string;
   city?: string;
@@ -16,6 +24,7 @@ interface User {
   role: string;
   skills?: string[];
   surname: string;
+  Company_User: Company_User[]
 }
 
 const initialState: User = {
@@ -33,6 +42,7 @@ const initialState: User = {
   role: "",
   skills: [],
   surname: "",
+  Company_User: []
 };
 
 interface UserStore {

@@ -1,8 +1,9 @@
 import { Dialog } from "@headlessui/react";
-import { Bot, FileText, Mail, Menu, X } from "lucide-react";
+import { Bot, Brain, FileText, Mail, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { useUserStore } from "@/zustand/userDataStore";
 
 import {
   LayoutDashboard,
@@ -24,53 +25,70 @@ export default function MobileMenu() {
   const { company_name } = useParams();
   const pathname = usePathname();
 
+  const { user } = useUserStore();
+
   const navItems = [
     {
       name: "Dashboard",
       icon: <LayoutDashboard className="w-5 h-5" />,
       path: `/${company_name}/dashboard`,
-    },
-    {
-      name: "Jobs",
-      icon: <Briefcase className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/jobs`,
+      role: "Both",
     },
     {
       name: "Applications",
       icon: <Users className="w-5 h-5" />,
       path: `/${company_name}/dashboard/applications`,
+      role: "Admin",
     },
     {
-      name: "Candidate Helper",
-      icon: <MessageSquare className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/chat`,
-    },
-    {
-      name: "Team",
-      icon: <UserPlus className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/team`,
-    },
-    {
-      name: "Settings",
-      icon: <Settings className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/settings`,
-    },
-    {
-      name: "My Applications",
-      icon: <FileText className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/my-applications`,
+      name: "Jobs",
+      icon: <Briefcase className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/jobs`,
+      role: "Admin",
     },
     {
       name: "Chat Assistant",
       icon: <Bot className="w-5 h-5" />,
       path: `/${company_name}/dashboard/candidate-chat`,
+      role: "Both",
     },
+    {
+      name: "Knowledge Base",
+      icon: <Brain className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/knowledge-base`,
+      role: "Admin",
+    },
+    // {
+    //   name: "Team",
+    //   icon: <UserPlus className="w-5 h-5" />,
+    //   path: `/${company_name}/dashboard/team`,
+    //   role: 'Admin'
+    // },
+    {
+      name: "My Applications",
+      icon: <FileText className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/my-applications`,
+      role: "Candidate",
+    },
+
     {
       name: "Invite",
       icon: <Mail className="w-5 h-5" />,
       path: `/${company_name}/dashboard/invites`,
+      role: "Admin",
+    },
+    {
+      name: "Settings",
+      icon: <Settings className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/settings`,
+      role: "Both",
     },
   ];
+
+  // Filter nav items based on user role
+  const filteredNavItems = navItems.filter(
+    (item) => item.role === user.role || item.role === "Both"
+  );
 
   return (
     <div>
