@@ -24,7 +24,7 @@ import { useUserStore } from "@/zustand/userDataStore";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loading, LoadingBar, LoadingDots } from "@/components/ui/loading";
-import { AdminDashboard } from "@/app/pages/AdminDashboard/page";
+import AdminDashboard from "@/app/pages/AdminDashboard/page";
 import CandidateDashboard from "@/app/pages/CandidateDashboard/page";
 
 export default function DashboardPage() {

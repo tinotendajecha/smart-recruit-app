@@ -120,7 +120,7 @@ export default function EditCompanyPage() {
     country: "",
     city: "",
     services_provided: "",
-    website: "",
+    // website: "",
     about_company: "",
     featured: null,
     founded: "",
