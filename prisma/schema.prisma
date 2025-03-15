@@ -46,6 +46,7 @@ model Company {
   services_provided String
   company_website   String
   // adding these
+  short_description String?
   about_company     String?
   founded           String?
   linkedin          String?
@@ -56,7 +57,7 @@ model Company {
   email             String?
   phone             String?
   Address           String?
-  website           String?
+  featured         Boolean?
   // added these
   Company_User      Company_User[]
   createdAt         DateTime       @default(now())

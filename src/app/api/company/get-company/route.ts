@@ -3,7 +3,7 @@ import prisma from "@/utils/dbconfig";
 export async function GET(req: Request) {
   try {
 
-    // Need company id
+    // Need company Id
     const url = new URL(req.url)
     const company_id = url.searchParams.get('company_id');
 
@@ -22,7 +22,7 @@ export async function GET(req: Request) {
     });
     
     // Return the job data
-    return new Response(JSON.stringify({ message: "Success!", 
+    return new Response(JSON.stringify({ message: "Success fetching company!", 
         company
     }), {
       status: 200,
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
   } catch (error) {
     console.log(error);
     return new Response(
-      JSON.stringify({ message: "Internal server error when missing company profile" }),
+      JSON.stringify({ message: "Internal server error when missing company profile!" }),
       {
         status: 500,
       }

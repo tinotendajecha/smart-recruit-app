@@ -19,7 +19,7 @@ import {
   FileText,
   Mail,
   Brain,
-  Building2
+  Building2,
 } from "lucide-react";
 import { Loading } from "@/components/ui/loading";
 
@@ -28,6 +28,8 @@ import { useUserStore } from "@/zustand/userDataStore";
 
 // import { useRouter } from "next/router";
 import MobileMenu from "@/components/MobileMenu";
+// import Router from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function DashboardLayout({
   children,
@@ -44,12 +46,27 @@ export default function DashboardLayout({
   // Load user from store
   const { user } = useUserStore();
 
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    try {
+      // Logout
+      // Clear the session cookie
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      router.push("/auth/login");
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     if (user.role) {
       setIsLoading(false);
     }
-  })
-
+  });
 
   const navItems = [
     {
@@ -111,7 +128,7 @@ export default function DashboardLayout({
       icon: <Settings className="w-5 h-5" />,
       path: `/${company_name}/dashboard/settings`,
       role: "Both",
-    }    
+    },
   ];
 
   // Filter nav items based on user role
@@ -119,12 +136,12 @@ export default function DashboardLayout({
     (item) => item.role === user.role || item.role === "Both"
   );
 
-  if(isLoading) {
-    return(
+  if (isLoading) {
+    return (
       <div className="flex justify-center items-center h-screen">
-         <Loading />
+        <Loading />
       </div>
-    )
+    );
   }
 
   return (
@@ -183,14 +200,40 @@ export default function DashboardLayout({
                   <Bell className="w-6 h-6" />
                   <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
                 </button>
-                <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
-                  <img
-                    src={`https://ui-avatars.com/api/?name=${user.name}+${user.surname}`}
-                    alt="Profile"
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <ChevronDown className="w-4 h-4" />
-                </button>
+                <div className="relative group">
+                  <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${user.name}+${user.surname}`}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
+                    <Link
+                      href={`/${company_name}/dashboard/my-profile`}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      My Profile
+                    </Link>
+                    <Link
+                      href={`/${company_name}/dashboard/settings`}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Settings
+                    </Link>
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <button
+                      onClick={() => {
+                        // Add your logout logic here
+                        console.log("Logging out...");
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -242,16 +285,39 @@ export default function DashboardLayout({
                 <Bell className="w-6 h-6" />
                 <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
-              <Link href={`/${company_name}/dashboard/my-profile`}>
-                <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
-                  <img
-                    src={`https://ui-avatars.com/api/?name=${user.name}+${user.surname}`}
-                    alt="Profile"
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </Link>
+              <div className="relative group">
+                <Link href={`/${company_name}/dashboard/my-profile`}>
+                  <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg">
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${user.name}+${user.surname}`}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </Link>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
+                  <Link
+                    href={`/${company_name}/dashboard/my-profile`}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    My Profile
+                  </Link>
+                  <Link
+                    href={`/${company_name}/dashboard/settings`}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Settings
+                  </Link>
+                  <div className="border-t border-gray-100 my-1"></div>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </header>

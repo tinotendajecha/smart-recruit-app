@@ -13,6 +13,7 @@ export interface Job {
     benefits_desc: string;
     benefits_list: string[];
     status: string;
+    companyId? : string;
     createdAt: Date;
     updatedAt: Date;
   }

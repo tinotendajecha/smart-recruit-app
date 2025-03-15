@@ -18,11 +18,10 @@ import { useFormStore } from "@/zustand/companyFormStore";
 import { useRouter } from "next/navigation";
 
 const page = () => {
-  
-  // Instantiate zustand state 
-  const setFormStore = useFormStore((state) => state.setFormStore)
+  // Instantiate zustand state
+  const setFormStore = useFormStore((state) => state.setFormStore);
 
-  const router  = useRouter()
+  const router = useRouter();
 
   const formSchema = z.object({
     companyName: z
@@ -52,10 +51,10 @@ const page = () => {
     console.log(values);
 
     // Set state to Zustand
-    setFormStore(values)
+    setFormStore(values);
 
     // navigate to next pagee
-    router.push('/register/user')
+    router.push("/register/user");
   };
 
   return (
@@ -82,8 +81,8 @@ const page = () => {
                     <FormItem>
                       <FormLabel>Company Name</FormLabel>
                       <FormControl>
-                        <Input 
-                          {...field} 
+                        <Input
+                          {...field}
                           placeholder="Enter your company name"
                           className="h-11"
                         />
@@ -104,12 +103,11 @@ const page = () => {
                           {...field}
                           className="w-full h-11 px-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         >
-                          <option value="">Select an option</option>
-                          <option value="1-2">1 - 2</option>
-                          <option value="2-10">2 - 10</option>
-                          <option value="10-20">10-20</option>
-                          <option value="20-100">20-100</option>
-                          <option value="More than 100">More than 100</option>
+                          <option value="Small (1-50)">Small (1-50)</option>
+                          <option value="Medium (51-500)">
+                            Medium (51-500)
+                          </option>
+                          <option value="Large (500+)">Large (500+)</option>
                         </select>
                       </FormControl>
                       <FormMessage />
@@ -124,8 +122,8 @@ const page = () => {
                     <FormItem>
                       <FormLabel>Country</FormLabel>
                       <FormControl>
-                        <Input 
-                          {...field} 
+                        <Input
+                          {...field}
                           placeholder="Enter your country"
                           className="h-11"
                         />
@@ -142,8 +140,8 @@ const page = () => {
                     <FormItem>
                       <FormLabel>City</FormLabel>
                       <FormControl>
-                        <Input 
-                          {...field} 
+                        <Input
+                          {...field}
                           placeholder="Enter your city"
                           className="h-11"
                         />
@@ -158,19 +156,39 @@ const page = () => {
                   name="servicesProvided"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Services Provided</FormLabel>
+                      <FormLabel>Industry / Service</FormLabel>
                       <FormControl>
                         <select
                           {...field}
                           className="w-full h-11 px-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                         >
                           <option value="">Select a service</option>
-                          <option value="softwareDevelopment">
+                          <option value="Software Development">
                             Software Development
                           </option>
-                          <option value="clothing">Clothing</option>
+                          <option value="Clothing">Clothing</option>
                           <option value="Marketing">Marketing</option>
-                          <option value="other">Other</option>
+                          <option value="Finance & Accounting">
+                            Finance & Accounting
+                          </option>
+                          <option value="Healthcare & Medical">
+                            Healthcare & Medical
+                          </option>
+                          <option value="Education & Training">
+                            Education & Training
+                          </option>
+                          <option value="Construction & Engineering">
+                            Construction & Engineering
+                          </option>
+                          <option value="Real Estate">Real Estate</option>
+                          <option value="E-commerce">E-commerce</option>
+                          <option value="Logistics & Transportation">
+                            Logistics & Transportation
+                          </option>
+                          <option value="Agriculture & Farming">
+                            Agriculture & Farming
+                          </option>
+                          <option value="Other">Other</option>
                         </select>
                       </FormControl>
                       <FormMessage />
@@ -185,8 +203,8 @@ const page = () => {
                     <FormItem>
                       <FormLabel>Company Website</FormLabel>
                       <FormControl>
-                        <Input 
-                          {...field} 
+                        <Input
+                          {...field}
                           placeholder="https://example.com"
                           className="h-11"
                         />
@@ -198,12 +216,12 @@ const page = () => {
               </div>
 
               {/* <Link href="/register/admin-user" className="block"> */}
-                <Button 
+              <Button
                 className="w-full h-11 bg-green-600 hover:bg-green-500 transition-colors duration-300"
                 //  onClick={onSubmit}
-                 >
-                  Next
-                </Button>
+              >
+                Next
+              </Button>
               {/* </Link> */}
             </form>
           </Form>
@@ -226,7 +244,7 @@ const page = () => {
               fill="#16a34a"
               fillOpacity="0.1"
             />
-            
+
             {/* Building/Company Representation */}
             <path
               d="M150 350V200H350V350"
@@ -249,7 +267,7 @@ const page = () => {
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-            
+
             {/* Decorative Elements */}
             <circle cx="250" cy="300" r="20" fill="#16a34a" fillOpacity="0.4" />
             <path
@@ -263,12 +281,14 @@ const page = () => {
               fillOpacity="0.3"
             />
           </svg>
-          
+
           <div className="mt-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-800">Grow Your Business</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Grow Your Business
+            </h2>
             <p className="mt-2 text-gray-600">
-              Join our platform and connect with talented professionals. 
-              Let us help you build the perfect team for your company.
+              Join our platform and connect with talented professionals. Let us
+              help you build the perfect team for your company.
             </p>
           </div>
         </div>

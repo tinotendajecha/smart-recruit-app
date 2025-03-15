@@ -1,13 +1,13 @@
-'use client'
-import { useEffect, useState } from 'react';
-import { 
-  ChevronRight, 
-  Building, 
-  MapPin, 
-  Globe, 
-  Calendar, 
-  Mail, 
-  Phone, 
+"use client";
+import { useEffect, useState } from "react";
+import {
+  ChevronRight,
+  Building,
+  MapPin,
+  Globe,
+  Calendar,
+  Mail,
+  Phone,
   Save,
   ArrowLeft,
   Plus,
@@ -16,12 +16,15 @@ import {
   Users,
   Facebook,
   Linkedin,
-  Twitter
-} from 'lucide-react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { useUserStore } from '@/zustand/userDataStore';
-import { Loading } from '@/components/ui/loading';
+  Twitter,
+} from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useUserStore } from "@/zustand/userDataStore";
+import { Loading } from "@/components/ui/loading";
+import { Company } from "@/types/Company";
+import { useRouter } from "next/navigation";
+import { set } from "zod";
 
 interface TagInputProps {
   tags: string[];
@@ -30,24 +33,24 @@ interface TagInputProps {
 }
 
 const TagInput = ({ tags, setTags, placeholder }: TagInputProps) => {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
 
   const addTag = () => {
     if (input.trim()) {
       setTags([...tags, input.trim()]);
-      setInput('');
+      setInput("");
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && input.trim()) {
+    if (e.key === "Enter" && input.trim()) {
       e.preventDefault();
       addTag();
     }
   };
 
   const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const { company_name } = useParams();
@@ -97,84 +100,122 @@ const TagInput = ({ tags, setTags, placeholder }: TagInputProps) => {
 };
 
 export default function EditCompanyPage() {
-    const { company_name } = useParams();
+  const { company_name } = useParams();
 
-    const { user } = useUserStore();
-    const [isloading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-    useEffect(() => {
-        if (user) {
-            setIsLoading(false);
-        }
-    })
+  const { user } = useUserStore();
+  const [isloading, setIsLoading] = useState(true);
 
-    // Get company data
-    useEffect(() => {
-      async function getCompanyData(){
-        const getCompanyData = await fetch(``)
-      }
-    })
-
-    
-  // Mock data - in a real app, this would come from your API
-  const [formData, setFormData] = useState({
-    name: "Yirifi",
-    logo: "https://ui-avatars.com/api/?name=Yirifi&background=0A5C36&color=fff",
-    size: "Medium (51-500)",
-    country: "Zimbabwe",
-    city: "Harare",
-    services: "Software Development",
-    website: "https://yirifi.com",
-    description: "Building the future of African technology with innovative solutions.",
-    featured: true,
-    founded: "2018",
-    about: "",
-    culture: "",
-    benefits_list: [] as string[],
-    contact_email: "info@yirifi.com",
-    contact_phone: "+263 123 456 789",
-    contact_address: "123 Innovation Drive, Harare, Zimbabwe",
-    linkedin: "",
-    twitter: "",
-    facebook: ""
+  useEffect(() => {
+    if (user) {
+      setIsLoading(false);
+    }
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const [formData, setFormData] = useState<Company>({
+    id: "",
+    company_name: "",
+    organization_size: "",
+    country: "",
+    city: "",
+    services_provided: "",
+    website: "",
+    about_company: "",
+    featured: null,
+    founded: "",
+    company_culture: "",
+    benefits_and_perks: [] as string[],
+    email: "",
+    phone: "",
+    Address: "",
+    linkedin: "",
+    Twitter: "",
+    Facebook: "",
+    short_description: "",
+    company_website: "", // Add a default company_website value
+  });
+
+  // Get company data
+  useEffect(() => {
+    async function getCompanyInfo() {
+      setIsLoading(true);
+      const getCompanyData = await fetch(
+        `/api/company/get-company?company_id=${user.Company_User[0].company_id}`
+      );
+
+      if (getCompanyData.status === 200) {
+        const companyData = await getCompanyData.json();
+        const company: Company = companyData.company;
+
+        setFormData(company);
+      }
+      setIsLoading(false);
+    }
+    getCompanyInfo();
+  }, []);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: checked
+      [name]: checked,
     }));
   };
-  
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+    console.log('whyyy')
+
+    setIsLoading(true);
     // Here you would call your API to update the company profile
-    alert("Company profile updated successfully!");
+
+    const updateCompany = await fetch("/api/company/update-company", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    console.log(updateCompany);
+
+    if (updateCompany.status == 200) {
+      const response = await updateCompany.json();
+      setIsLoading(false);
+    }
+
+    router.push(`/${company_name}/dashboard`);
   };
 
   if (isloading) {
-    return(
-      <div className='flex justify-center items-center h-screen'>
-         <Loading />;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loading />;
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-500">
-        <Link href={`/${company_name}/dashboard`} className="flex items-center hover:text-gray-700">
+        <Link
+          href={`/${company_name}/dashboard`}
+          className="flex items-center hover:text-gray-700"
+        >
           {/* <ArrowLeft className="w-4 h-4 mr-1" /> */}
           Back to Dashboard
         </Link>
@@ -185,7 +226,9 @@ export default function EditCompanyPage() {
       {/* Main Content */}
       <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
         <h1 className="text-2xl font-semibold mb-2">Edit Company Profile</h1>
-        <p className="text-gray-500 mb-6">Update your company information to attract the best candidates.</p>
+        <p className="text-gray-500 mb-6">
+          Update your company information to attract the best candidates.
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Details Section */}
@@ -201,24 +244,19 @@ export default function EditCompanyPage() {
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="company_name"
+                  value={
+                    formData.company_name
+                      .split("-") // Split by hyphen
+                      .map(
+                        (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                      ) // Capitalize first letter
+                      .join(" ") // Join words with space
+                  }
                   onChange={handleInputChange}
+                  readOnly
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., Yirifi"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Logo URL
-                </label>
-                <input
-                  type="text"
-                  name="logo"
-                  value={formData.logo}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  placeholder="e.g., https://example.com/logo.png"
                 />
               </div>
               <div>
@@ -226,8 +264,8 @@ export default function EditCompanyPage() {
                   Company Size
                 </label>
                 <select
-                  name="size"
-                  value={formData.size}
+                  name="organization_size"
+                  value={formData.organization_size}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 >
@@ -242,9 +280,10 @@ export default function EditCompanyPage() {
                 </label>
                 <input
                   type="text"
-                  name="services"
-                  value={formData.services}
+                  name="services_provided"
+                  value={formData.services_provided}
                   onChange={handleInputChange}
+                  required
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., Software Development"
                 />
@@ -256,8 +295,9 @@ export default function EditCompanyPage() {
                 <input
                   type="text"
                   name="founded"
-                  value={formData.founded}
+                  value={formData.founded ?? ""}
                   onChange={handleInputChange}
+                  required
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 2018"
                 />
@@ -270,30 +310,32 @@ export default function EditCompanyPage() {
                   <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400 w-5 h-5" />
                   <input
                     type="text"
-                    name="website"
-                    value={formData.website}
+                    name="company_website"
+                    value={formData.company_website ?? ""}
                     onChange={handleInputChange}
+                    required
                     className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     placeholder="e.g., https://yirifi.com"
                   />
                 </div>
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Short Description
               </label>
               <textarea
-                name="description"
-                value={formData.description}
+                name="short_description"
+                value={formData.short_description ?? ""}
                 onChange={handleInputChange}
                 rows={2}
+                required
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 placeholder="Brief description of your company"
               />
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -304,6 +346,7 @@ export default function EditCompanyPage() {
                   name="country"
                   value={formData.country}
                   onChange={handleInputChange}
+                  required
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., Zimbabwe"
                 />
@@ -318,6 +361,7 @@ export default function EditCompanyPage() {
                     type="text"
                     name="city"
                     value={formData.city}
+                    required
                     onChange={handleInputChange}
                     className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     placeholder="e.g., Harare"
@@ -325,17 +369,20 @@ export default function EditCompanyPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="featured"
                 name="featured"
-                checked={formData.featured}
+                checked={!!formData.featured}
                 onChange={handleCheckboxChange}
                 className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
               />
-              <label htmlFor="featured" className="ml-2 block text-sm text-gray-700">
+              <label
+                htmlFor="featured"
+                className="ml-2 block text-sm text-gray-700"
+              >
                 Feature this company (will be highlighted in company listings)
               </label>
             </div>
@@ -353,10 +400,11 @@ export default function EditCompanyPage() {
                   About Company
                 </label>
                 <textarea
-                  name="about"
-                  value={formData.about}
+                  name="about_company"
+                  value={formData.about_company ?? ""}
                   onChange={handleInputChange}
                   rows={4}
+                  required
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="Detailed description of your company, history, mission, etc."
                 />
@@ -366,10 +414,11 @@ export default function EditCompanyPage() {
                   Company Culture
                 </label>
                 <textarea
-                  name="culture"
-                  value={formData.culture}
+                  name="company_culture"
+                  value={formData.company_culture ?? ""}
                   onChange={handleInputChange}
                   rows={4}
+                  required
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="Describe your company culture, values, work environment, etc."
                 />
@@ -379,8 +428,13 @@ export default function EditCompanyPage() {
                   Benefits & Perks
                 </label>
                 <TagInput
-                  tags={formData.benefits_list}
-                  setTags={(newTags) => setFormData(prev => ({ ...prev, benefits_list: newTags }))}
+                  tags={formData.benefits_and_perks}
+                  setTags={(newTags) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      benefits_and_perks: newTags,
+                    }))
+                  }
                   placeholder="Add a benefit and press Enter (e.g., Health Insurance)"
                 />
               </div>
@@ -402,8 +456,9 @@ export default function EditCompanyPage() {
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400 w-5 h-5" />
                   <input
                     type="email"
-                    name="contact_email"
-                    value={formData.contact_email}
+                    name="email"
+                    required
+                    value={formData.email ?? ""}
                     onChange={handleInputChange}
                     className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     placeholder="e.g., info@yirifi.com"
@@ -418,8 +473,9 @@ export default function EditCompanyPage() {
                   <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400 w-5 h-5" />
                   <input
                     type="text"
-                    name="contact_phone"
-                    value={formData.contact_phone}
+                    name="phone"
+                    required
+                    value={formData.phone ?? ""}
                     onChange={handleInputChange}
                     className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     placeholder="e.g., +263 123 456 789"
@@ -435,8 +491,9 @@ export default function EditCompanyPage() {
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400 w-5 h-5" />
                 <input
                   type="text"
-                  name="contact_address"
-                  value={formData.contact_address}
+                  name="Address"
+                  required
+                  value={formData.Address ?? ""}
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="e.g., 123 Innovation Drive, Harare, Zimbabwe"
@@ -461,7 +518,7 @@ export default function EditCompanyPage() {
                   <input
                     type="text"
                     name="linkedin"
-                    value={formData.linkedin}
+                    value={formData.linkedin ?? ""}
                     onChange={handleInputChange}
                     className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     placeholder="e.g., https://linkedin.com/company/yirifi"
@@ -476,8 +533,8 @@ export default function EditCompanyPage() {
                   <Twitter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400 w-5 h-5" />
                   <input
                     type="text"
-                    name="twitter"
-                    value={formData.twitter}
+                    name="Twitter"
+                    value={formData.Twitter ?? ""}
                     onChange={handleInputChange}
                     className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     placeholder="e.g., https://twitter.com/yirifi"
@@ -492,8 +549,8 @@ export default function EditCompanyPage() {
                   <Facebook className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-400 w-5 h-5" />
                   <input
                     type="text"
-                    name="facebook"
-                    value={formData.facebook}
+                    name="Facebook"
+                    value={formData.Facebook ?? ""}
                     onChange={handleInputChange}
                     className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     placeholder="e.g., https://facebook.com/yirifi"

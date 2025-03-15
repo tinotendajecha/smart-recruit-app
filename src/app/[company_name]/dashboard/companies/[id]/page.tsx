@@ -1,151 +1,111 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { 
-  Building, 
-  MapPin, 
-  Users, 
-  Globe, 
-  Briefcase, 
-  Calendar, 
+import { useEffect, useState } from "react";
+import {
+  Building,
+  MapPin,
+  Users,
+  Globe,
+  Briefcase,
+  Calendar,
   ChevronRight,
   ArrowLeft,
   ExternalLink,
   Mail,
   Phone,
   Clock,
-  DollarSign
-} from 'lucide-react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-
-// Mock data for companies
-const companiesData = [
-  {
-    id: 1,
-    name: 'Yirifi',
-    logo: 'https://ui-avatars.com/api/?name=Yirifi&background=0A5C36&color=fff',
-    size: 'Medium (51-500)',
-    country: 'Zimbabwe',
-    city: 'Harare',
-    services: 'Software Development',
-    website: 'https://yirifi.com',
-    description: 'Building the future of African technology with innovative solutions.',
-    featured: true,
-    founded: '2018',
-    about: 'Yirifi is a leading technology company based in Harare, Zimbabwe, focused on developing innovative software solutions for businesses across Africa. Our mission is to empower African businesses through technology and create sustainable digital ecosystems.',
-    culture: 'At Yirifi, we believe in fostering a collaborative and innovative work environment. We value diversity, continuous learning, and a strong commitment to excellence. Our team is passionate about using technology to solve real-world problems and make a positive impact in Africa.',
-    benefits: [
-      'Competitive salary and benefits package',
-      'Remote work options',
-      'Professional development opportunities',
-      'Health insurance',
-      'Paid time off',
-      'Team building events'
-    ],
-    contact: {
-      email: 'careers@yirifi.com',
-      phone: '+263 123 456 789',
-      address: '123 Innovation Drive, Harare, Zimbabwe'
-    },
-    socialMedia: {
-      linkedin: 'https://linkedin.com/company/yirifi',
-      twitter: 'https://twitter.com/yirifi',
-      facebook: 'https://facebook.com/yirifi'
-    }
-  },
-  {
-    id: 2,
-    name: 'Acme Corp',
-    logo: 'https://ui-avatars.com/api/?name=AC&background=3B82F6&color=fff',
-    size: 'Large (500+)',
-    country: 'United States',
-    city: 'San Francisco',
-    services: 'Software Development',
-    website: 'https://acmecorp.example',
-    description: 'Leading provider of cloud infrastructure and enterprise solutions.',
-    featured: false,
-    founded: '2005',
-    about: 'Acme Corp is a global leader in cloud infrastructure and enterprise solutions. We help businesses of all sizes transform their operations through innovative technology solutions.',
-    culture: 'Our culture is built on innovation, collaboration, and customer obsession. We believe in empowering our employees to take ownership and make a difference.',
-    benefits: [
-      'Competitive salary and equity',
-      'Comprehensive health benefits',
-      'Flexible work arrangements',
-      '401(k) matching',
-      'Continuous learning stipend',
-      'Wellness programs'
-    ],
-    contact: {
-      email: 'careers@acmecorp.example',
-      phone: '+1 (555) 123-4567',
-      address: '123 Tech Avenue, San Francisco, CA, USA'
-    },
-    socialMedia: {
-      linkedin: 'https://linkedin.com/company/acmecorp',
-      twitter: 'https://twitter.com/acmecorp',
-      facebook: 'https://facebook.com/acmecorp'
-    }
-  }
-];
-
-// Mock data for jobs
-const jobsData = [
-  {
-    id: 1,
-    companyId: 1,
-    title: 'Senior Developer',
-    department: 'Engineering',
-    type: 'Full-time',
-    location: 'Remote',
-    salary: { min: 120000, max: 150000 },
-    postedDate: '2 days ago',
-    description: 'We are looking for an experienced developer to join our team...'
-  },
-  {
-    id: 2,
-    companyId: 1,
-    title: 'Product Manager',
-    department: 'Product',
-    type: 'Full-time',
-    location: 'Harare',
-    salary: { min: 130000, max: 160000 },
-    postedDate: '1 week ago',
-    description: 'Seeking a product manager to lead our product initiatives...'
-  },
-  {
-    id: 3,
-    companyId: 2,
-    title: 'Frontend Developer',
-    department: 'Engineering',
-    type: 'Full-time',
-    location: 'San Francisco',
-    salary: { min: 110000, max: 140000 },
-    postedDate: '3 days ago',
-    description: 'Join our frontend team to build amazing user experiences...'
-  }
-];
+  DollarSign,
+} from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { Company } from "@/types/Company";
+import { Job } from "@/types/Job";
 
 export default function CompanyDetailsPage() {
+  const [companiesData, setCompaniesData] = useState<Company[]>([]);
+  const [jobsData, setJobsData] = useState<Job[]>([]);
   const { id } = useParams();
-  const companyId = parseInt(id as string);
-  
+
+  const getRandomColor = () => {
+    const colors = [
+      "4CAF50", // Medium Green
+      "388E3C", // Darker Green
+      "2E7D32", // Deep Green
+      "1B5E20", // Forest Green
+      "66BB6A", // Light Green
+      "FF9800", // Orange
+      "F44336", // Red
+      "03A9F4", // Sky Blue
+      "9C27B0", // Purple
+      "FFEB3B", // Yellow
+      "FF5722", // Deep Orange
+      "00BCD4", // Cyan
+      "8BC34A", // Light Olive Green
+      "607D8B", // Muted Blue-Gray
+      "795548", // Warm Brown
+    ];
+    // Shades of green
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  useEffect(() => {
+    try {
+      fetch("/api/company/get-companies")
+        .then((res) => res.json())
+        .then((data) => {
+          setCompaniesData(data.companies);
+          // setFilteredCompanies(data.companies);
+        })
+        .catch((error) => console.error("Error fetching companies:", error));
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      fetch(`/api/jobs/get-jobs?companyId=${id}`)
+        .then((res: Response) => res.json())
+        .then((data: { jobs: Job[] }) => {
+          setJobsData(data.jobs);
+          console.log(data.jobs);
+        })
+        .catch((error: Error) => console.error("Error fetching jobs:", error));
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  // const companyId = parseInt(id as string);
+
   // Find the company by ID
-  const company = companiesData.find(c => c.id === companyId);
-  
+  const company = companiesData.find((c) => c.id === id);
+
+  const socialMediaLinks = company
+    ? {
+        LinkedIn: company.linkedin,
+        Twitter: company.Twitter,
+        Facebook: company.Facebook,
+      }
+    : {};
+
   // Find jobs for this company
-  const companyJobs = jobsData.filter(job => job.companyId === companyId);
-  
+  const companyJobs = jobsData;
+
   // Tab state
-  const [activeTab, setActiveTab] = useState('about');
-  
+  const [activeTab, setActiveTab] = useState("about");
+
   if (!company) {
     return (
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
         <Building className="w-16 h-16 text-gray-300 mb-4" />
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Company Not Found</h1>
-        <p className="text-gray-600 mb-6">The company you're looking for doesn't exist or has been removed.</p>
-        <Link 
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+          Company Not Found
+        </h1>
+        <p className="text-gray-600 mb-6">
+          The company you're looking for doesn't exist or has been removed.
+        </p>
+        <Link
           href="/companies"
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
         >
@@ -160,7 +120,10 @@ export default function CompanyDetailsPage() {
       <div className="max-w-7xl mx-auto">
         {/* Breadcrumb */}
         <div className="flex items-center text-sm text-gray-500 mb-6">
-          <Link href="/companies" className="flex items-center hover:text-gray-700">
+          <Link
+            href="/candidate/dashboard/companies"
+            className="flex items-center hover:text-gray-700"
+          >
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to Companies
           </Link>
@@ -170,16 +133,24 @@ export default function CompanyDetailsPage() {
         <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
           <div className="p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-              <img 
-                src={company.logo} 
-                alt={company.name} 
-                className="w-24 h-24 rounded-lg"
+              <img
+                src={`https://ui-avatars.com/api/?name=${
+                  company.company_name
+                }&background=${getRandomColor()}&color=ffffff&rounded=true&size=128`}
+                alt="Profile"
+                className="w-16 h-16 rounded-full"
               />
               <div className="flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{company.name}</h1>
-                    <p className="text-gray-600 mt-1">{company.description}</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                      {company.company_name
+                        .replaceAll("-", " ") // Replace hyphens with spaces if needed
+                        .replace(/\b\w/g, (char) => char.toUpperCase())}
+                    </h1>
+                    <p className="text-gray-600 mt-1">
+                      {company.short_description}
+                    </p>
                     <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-600">
                       <div className="flex items-center gap-1">
                         <MapPin className="w-4 h-4" />
@@ -187,7 +158,7 @@ export default function CompanyDetailsPage() {
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4" />
-                        {company.size}
+                        {company.organization_size}
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
@@ -195,9 +166,9 @@ export default function CompanyDetailsPage() {
                       </div>
                     </div>
                   </div>
-                  <a 
-                    href={company.website} 
-                    target="_blank" 
+                  <a
+                    href={company.company_website}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 whitespace-nowrap"
                   >
@@ -214,41 +185,41 @@ export default function CompanyDetailsPage() {
             <div className="flex overflow-x-auto">
               <button
                 className={`px-6 py-3 text-sm font-medium whitespace-nowrap ${
-                  activeTab === 'about' 
-                    ? 'border-b-2 border-green-600 text-green-600' 
-                    : 'text-gray-500 hover:text-gray-700'
+                  activeTab === "about"
+                    ? "border-b-2 border-green-600 text-green-600"
+                    : "text-gray-500 hover:text-gray-700"
                 }`}
-                onClick={() => setActiveTab('about')}
+                onClick={() => setActiveTab("about")}
               >
                 About
               </button>
               <button
                 className={`px-6 py-3 text-sm font-medium whitespace-nowrap ${
-                  activeTab === 'jobs' 
-                    ? 'border-b-2 border-green-600 text-green-600' 
-                    : 'text-gray-500 hover:text-gray-700'
+                  activeTab === "jobs"
+                    ? "border-b-2 border-green-600 text-green-600"
+                    : "text-gray-500 hover:text-gray-700"
                 }`}
-                onClick={() => setActiveTab('jobs')}
+                onClick={() => setActiveTab("jobs")}
               >
                 Jobs ({companyJobs.length})
               </button>
               <button
                 className={`px-6 py-3 text-sm font-medium whitespace-nowrap ${
-                  activeTab === 'culture' 
-                    ? 'border-b-2 border-green-600 text-green-600' 
-                    : 'text-gray-500 hover:text-gray-700'
+                  activeTab === "culture"
+                    ? "border-b-2 border-green-600 text-green-600"
+                    : "text-gray-500 hover:text-gray-700"
                 }`}
-                onClick={() => setActiveTab('culture')}
+                onClick={() => setActiveTab("culture")}
               >
                 Culture & Benefits
               </button>
               <button
                 className={`px-6 py-3 text-sm font-medium whitespace-nowrap ${
-                  activeTab === 'contact' 
-                    ? 'border-b-2 border-green-600 text-green-600' 
-                    : 'text-gray-500 hover:text-gray-700'
+                  activeTab === "contact"
+                    ? "border-b-2 border-green-600 text-green-600"
+                    : "text-gray-500 hover:text-gray-700"
                 }`}
-                onClick={() => setActiveTab('contact')}
+                onClick={() => setActiveTab("contact")}
               >
                 Contact
               </button>
@@ -259,27 +230,40 @@ export default function CompanyDetailsPage() {
         {/* Tab Content */}
         <div className="bg-white rounded-lg shadow-sm p-6 sm:p-8">
           {/* About Tab */}
-          {activeTab === 'about' && (
+          {activeTab === "about" && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">About {company.name}</h2>
-              <p className="text-gray-600 mb-6 leading-relaxed">{company.about}</p>
-              
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                About{" "}
+                {company.company_name
+                  .replaceAll("-", " ") // Replace hyphens with spaces if needed
+                  .replace(/\b\w/g, (char) => char.toUpperCase())}
+              </h2>
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                {company.about_company}
+              </p>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-3">Company Details</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-3">
+                    Company Details
+                  </h3>
                   <div className="space-y-3">
                     <div className="flex items-start gap-3">
                       <Briefcase className="w-5 h-5 text-gray-500 mt-0.5" />
                       <div>
                         <p className="font-medium">Industry</p>
-                        <p className="text-gray-600">{company.services}</p>
+                        <p className="text-gray-600">
+                          {company.services_provided}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <Users className="w-5 h-5 text-gray-500 mt-0.5" />
                       <div>
                         <p className="font-medium">Company Size</p>
-                        <p className="text-gray-600">{company.size}</p>
+                        <p className="text-gray-600">
+                          {company.organization_size}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -293,53 +277,65 @@ export default function CompanyDetailsPage() {
                       <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
                       <div>
                         <p className="font-medium">Headquarters</p>
-                        <p className="text-gray-600">{company.city}, {company.country}</p>
+                        <p className="text-gray-600">
+                          {company.city}, {company.country}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-3">Social Media</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-3">
+                    Social Media
+                  </h3>
                   <div className="space-y-3">
-                    {Object.entries(company.socialMedia).map(([platform, url]) => (
-                      <a 
-                        key={platform}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 text-green-600 hover:text-green-700"
-                      >
-                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                          <ExternalLink className="w-4 h-4" />
-                        </div>
-                        <span className="capitalize">{platform}</span>
-                      </a>
-                    ))}
+                    {Object.entries(socialMediaLinks)
+                      .filter(([_, url]) => url) // Only include non-null/non-empty links
+                      .map(([platform, url]) => (
+                        <a
+                          key={platform}
+                          href={url as string}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 text-green-600 hover:text-green-700"
+                        >
+                          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <ExternalLink className="w-4 h-4" />
+                          </div>
+                          <span className="capitalize">{platform}</span>
+                        </a>
+                      ))}
                   </div>
+                  ;
                 </div>
               </div>
             </div>
           )}
 
           {/* Jobs Tab */}
-          {activeTab === 'jobs' && (
+          {activeTab === "jobs" && (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Open Positions at {company.name}</h2>
-                <Link 
-                  href={`/${company.name.toLowerCase()}/openings`}
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Open Positions at{" "}
+                  {company.company_name
+                    .replaceAll("-", " ") // Replace hyphens with spaces if needed
+                    .replace(/\b\w/g, (char) => char.toUpperCase())}
+                </h2>
+                <Link
+                  href={`/${company.company_name.toLowerCase()}/openings`}
                   className="text-green-600 hover:text-green-700 font-medium flex items-center gap-1"
                 >
                   View All
                   <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
-              
+
               {companyJobs.length > 0 ? (
                 <div className="space-y-4">
                   {companyJobs.map((job) => (
-                    <div 
+                    <div
                       key={job.id}
                       className="border rounded-lg hover:shadow-md transition-shadow"
                     >
@@ -352,20 +348,23 @@ export default function CompanyDetailsPage() {
                             <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
                               <div className="flex items-center gap-1">
                                 <Building className="w-4 h-4" />
-                                {job.department}
+                                {job.department.charAt(0).toUpperCase() +
+                                  job.department.slice(1)}
                               </div>
                               <div className="flex items-center gap-1">
                                 <MapPin className="w-4 h-4" />
                                 {job.location}
                               </div>
-                              <div className="flex items-center gap-1">
+                              {/* <div className="flex items-center gap-1">
                                 <Clock className="w-4 h-4" />
-                                Posted {job.postedDate}
-                              </div>
+                                Posted {job.createdAt.toLocaleDateString()}
+                              </div> */}
                             </div>
                           </div>
-                          <Link 
-                            href={`/${company.name.toLowerCase()}/openings/${job.id}`}
+                          <Link
+                            href={`/${company.company_name.toLowerCase()}/openings/${
+                              job.id
+                            }`}
                             className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center"
                           >
                             Apply Now
@@ -373,16 +372,20 @@ export default function CompanyDetailsPage() {
                         </div>
 
                         <div className="mt-4">
-                          <p className="text-gray-600 text-sm sm:text-base line-clamp-2">{job.description}</p>
+                          <p className="text-gray-600 text-sm sm:text-base line-clamp-2">
+                            {job.description}
+                          </p>
                         </div>
 
                         <div className="mt-4 flex flex-wrap items-center gap-3 sm:gap-4">
                           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm bg-green-100 text-green-800">
-                            {job.type}
+                            {/* {job.type} */}
+                            Job Type
                           </span>
                           <span className="inline-flex items-center gap-1 text-sm text-gray-600">
-                            <DollarSign className="w-4 h-4" />
-                            ${job.salary.min.toLocaleString()} - ${job.salary.max.toLocaleString()}
+                            <DollarSign className="w-4 h-4" />$
+                            {job.compensation_minimum} - $
+                            {job.compensation_maximum}
                           </span>
                         </div>
                       </div>
@@ -392,9 +395,14 @@ export default function CompanyDetailsPage() {
               ) : (
                 <div className="text-center py-12 bg-gray-50 rounded-lg">
                   <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-1">No open positions</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-1">
+                    No open positions
+                  </h3>
                   <p className="text-gray-600">
-                    {company.name} doesn't have any open positions at the moment.
+                    {company.company_name
+                      .replaceAll("-", " ") // Replace hyphens with spaces if needed
+                      .replace(/\b\w/g, (char) => char.toUpperCase())}{" "}
+                    doesn't have any open positions at the moment.
                   </p>
                 </div>
               )}
@@ -402,26 +410,47 @@ export default function CompanyDetailsPage() {
           )}
 
           {/* Culture & Benefits Tab */}
-          {activeTab === 'culture' && (
+          {activeTab === "culture" && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Culture & Benefits</h2>
-              
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                Culture & Benefits
+              </h2>
+
               <div className="mb-8">
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Company Culture</h3>
-                <p className="text-gray-600 leading-relaxed">{company.culture}</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-3">
+                  Company Culture
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {company.company_culture}
+                </p>
               </div>
-              
+
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Benefits & Perks</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-3">
+                  Benefits & Perks
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {company.benefits.map((benefit, index) => (
+                  {company.benefits_and_perks.map((benefit, index) => (
                     <div key={index} className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-4 h-4 text-green-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       </div>
-                      <span className="text-gray-700">{benefit}</span>
+                      <span className="text-gray-700">
+                        {benefit.charAt(0).toUpperCase() +
+                          benefit.slice(1).toLowerCase()}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -430,48 +459,60 @@ export default function CompanyDetailsPage() {
           )}
 
           {/* Contact Tab */}
-          {activeTab === 'contact' && (
+          {activeTab === "contact" && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Contact Information</h2>
-              
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Contact Information
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Get in Touch</h3>
-                  
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Get in Touch
+                  </h3>
+
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
                       <Mail className="w-5 h-5 text-green-600 mt-0.5" />
                       <div>
                         <p className="font-medium">Email</p>
-                        <a href={`mailto:${company.contact.email}`} className="text-green-600 hover:underline">
-                          {company.contact.email}
+                        <a
+                          href={`mailto:${company.email}`}
+                          className="text-green-600 hover:underline"
+                        >
+                          {company.email}
                         </a>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start gap-3">
                       <Phone className="w-5 h-5 text-green-600 mt-0.5" />
                       <div>
                         <p className="font-medium">Phone</p>
-                        <a href={`tel:${company.contact.phone}`} className="text-green-600 hover:underline">
-                          {company.contact.phone}
+                        <a
+                          href={`tel:${company.phone}`}
+                          className="text-green-600 hover:underline"
+                        >
+                          {company.phone}
                         </a>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 text-green-600 mt-0.5" />
                       <div>
                         <p className="font-medium">Address</p>
-                        <p className="text-gray-600">{company.contact.address}</p>
+                        <p className="text-gray-600">{company.Address}</p>
                       </div>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Send a Message</h3>
-                  
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Send a Message
+                  </h3>
+
                   <form className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -483,7 +524,7 @@ export default function CompanyDetailsPage() {
                         placeholder="Enter your name"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Email Address
@@ -494,7 +535,7 @@ export default function CompanyDetailsPage() {
                         placeholder="Enter your email"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Message
@@ -505,7 +546,7 @@ export default function CompanyDetailsPage() {
                         placeholder="Enter your message"
                       />
                     </div>
-                    
+
                     <button
                       type="submit"
                       className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"

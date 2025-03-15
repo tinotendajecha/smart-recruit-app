@@ -119,7 +119,7 @@ export default function MobileMenu() {
                 </div>
                 <X size={30} />
               </div>
-              {navItems.map((item) => (
+              {filteredNavItems.map((item) => (
                 <a
                   key={item.name}
                   href={item.path}

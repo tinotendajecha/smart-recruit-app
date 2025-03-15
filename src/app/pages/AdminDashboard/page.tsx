@@ -24,6 +24,7 @@ import { useUserStore } from "@/zustand/userDataStore";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loading, LoadingBar, LoadingDots } from "@/components/ui/loading";
+import { Company } from "@/types/Company";
 
 
 
@@ -88,12 +89,13 @@ export function AdminDashboard() {
       async function getCompletionData(){
         setIsLoading(true)
         // Logic for getting company data
-        const companyInfo = await fetch(`/api/company/get-missing-company-fields?company_id=${user.Company_User[0].company_id}`) 
+        const companyInfo = await fetch(`/api/company/get-company?company_id=${user.Company_User[0].company_id}`) 
   
-        const data = await companyInfo.json()
+        if(companyInfo.status == 200){
+          const data = await companyInfo.json()
   
-        setCompanyProfileCompletion(calculateCompanyProfileCompletion(data.company))
-        
+          setCompanyProfileCompletion(calculateCompanyProfileCompletion(data.company))
+        }        
         setIsLoading(false)
       }
       getCompletionData()
