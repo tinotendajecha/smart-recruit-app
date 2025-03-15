@@ -28,7 +28,7 @@ import { Company } from "@/types/Company";
 
 
 
-export function AdminDashboard() {
+export default function AdminDashboard() {
     // Load user from local storage
     const { user } = useUserStore();
   
