@@ -362,7 +362,7 @@ export default function CompanyDetailsPage() {
                             </div>
                           </div>
                           <Link
-                            href={`/${company.company_name.toLowerCase()}/openings/${
+                            href={`/candidate/openings/apply/${
                               job.id
                             }`}
                             className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center"

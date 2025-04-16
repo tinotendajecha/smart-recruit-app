@@ -10,6 +10,8 @@ import {
   Filter,
   ChevronRight
 } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 // This would be fetched from your API based on the company
 const companyData = {
@@ -45,6 +47,8 @@ const jobs = [
 ];
 
 export default function CompanyOpeningsPage() {
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Company Header */}

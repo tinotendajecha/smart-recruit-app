@@ -35,6 +35,8 @@ model User {
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   Company_User    Company_User[]
+
+  JobApplication JobApplication[]
 }
 
 model Company {
@@ -96,6 +98,8 @@ model Job {
   User                 User[]
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
+
+  JobApplication JobApplication[]
 }
 
 model Verification_Codes {
@@ -105,4 +109,21 @@ model Verification_Codes {
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model JobApplication {
+  id            String   @id @default(uuid())
+  user          User     @relation(fields: [user_id], references: [id])
+  user_id       String
+  job           Job      @relation(fields: [job_id], references: [id])
+  job_id        String
+  linkedin_Profile String?
+  portfolio_website String?
+  years_of_experience String?
+  cover_letter  String?
+  resume_score String?
+  linkedin_score String?
+  status        String   @default("pending") // pending, accepted, rejected, etc.
+  appliedAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

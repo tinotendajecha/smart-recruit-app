@@ -15,8 +15,11 @@ import {
   Upload,
   X,
   Plus,
-  AlertCircle
+  AlertCircle,
+  Router
 } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 // Define Zod schema for form validation
 const jobFormSchema = z.object({
@@ -163,6 +166,10 @@ export default function CreateJobPage() {
     }
   };
   
+  const { company_name } = useParams()
+  const router = useRouter()
+
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -185,7 +192,8 @@ export default function CreateJobPage() {
 
       const data = await response.json()
 
-      console.log(data)
+      toast.success('Job created!')
+      router.push(`/${company_name}/dashboard/jobs`)
       
     } catch (error) {
       if (error instanceof z.ZodError) {
