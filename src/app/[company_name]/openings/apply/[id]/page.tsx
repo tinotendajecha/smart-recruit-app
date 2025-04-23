@@ -16,18 +16,32 @@ import { useEffect } from "react";
 import { Job } from "@/types/Job";
 import { Loading } from "@/components/ui/loading";
 import getRandomColor from "@/utils/getRandomColor";
+import { useUserStore } from "@/zustand/userDataStore";
+import { useRouter } from "next/navigation";
+import {toast} from 'react-toastify'
 
 // This would come from your API based on the job ID
 
 export default function JobApplicationPage() {
   const { id } = useParams();
-  const [jobData, setJobData] = useState<Job>();
+  const [jobData, setJobData] = useState<Job>({} as Job);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const router = useRouter();
+
+  // Get user id from zustand store
+  const user = useUserStore((state) => state.user);
+  const userId = user.id;
 
   useEffect(() => {
     // Trigger loading when state changes
-  }, [analyzing])
+  }, [analyzing, saving])
+
+  useEffect(() => {
+    // console.log("Updated Job Data:", jobData);
+  }, [jobData]);
 
   // Fetch job data based on ID (if needed)
   useEffect(() => {
@@ -36,7 +50,11 @@ export default function JobApplicationPage() {
         const response = await fetch(`/api/jobs/get-job-by-id?id=${id}`);
         const data = await response.json();
 
+        // console.log("Job Data:", data.job);
         setJobData(data.job);
+
+        // console.log("Job Data:", jobData)
+        // console.log("Job Data:", jobData);
         
         setLoading(false);
       } catch (error) {
@@ -111,20 +129,64 @@ export default function JobApplicationPage() {
 
         const data = await res.json();
 
+        setAnalyzing(false)
         return data
       } catch (error) {
         console.error("❌ Upload failed:", error);
       }
     }
 
-    const resumeScores = await analyseResume();
+    // Call the function to analyze the resume
+    setSaving(true)
 
-    if (resumeScores) {
-      console.log('Resume scores: ' + resumeScores)
+    interface ResumeData{
+      data: {
+        resume_text: string;
+        resume_score: number;
+      }
     }
+
+    const resumeData:ResumeData = await analyseResume();
+
+    // if (resumeData) {
+    //   console.log(resumeData)
+    // }
     
+    // console.log("Company Id: " + jobData?.company_id)
+
+    // console.log("Resume score "+ resumeData.data.score)
+
     // Step 2 : Save the application data to the database
-    console.log(resumeScores)
+    const data = {
+      userId: user.id,
+      jobId: jobData?.id,
+      linkedinProfile: formData.linkedin,
+      portfolioWebsite: formData.portfolio,
+      yearsOfExperience: formData.experience,
+      coverLetter: formData.coverLetter,
+      resumeMarkup: resumeData.data.resume_text,
+      resumeScore: resumeData.data.resume_score,
+      linkedinScore: 80,
+      companyId: jobData?.company_id,
+    };
+
+    // Make the request
+    const response = await fetch("/api/job-application/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const jobApplicationData = await response.json();
+    // console.log(jobApplicationData)
+
+    if(response.ok){
+      setSaving(false)
+      router.push('/candidate/dashboard/companies')
+      toast.success("Application submitted successfully! 🎉")
+    }
 
   };
 
@@ -140,6 +202,14 @@ export default function JobApplicationPage() {
     return(
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <Loading text="Analyzing resume🔥..." />
+      </div>
+    )
+  }
+
+  if(saving){
+    return(
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <Loading text="Saving to db✅..." />
       </div>
     )
   }
@@ -173,7 +243,7 @@ export default function JobApplicationPage() {
               <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
                 <div className="flex items-center gap-1">
                   <Building className="w-4 h-4" />
-                  {jobData?.companyId}
+                  {jobData?.company_id}
                 </div>
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />

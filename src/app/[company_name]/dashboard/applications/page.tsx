@@ -1,34 +1,54 @@
-'use client';
-
-import { FileText, Linkedin, ChevronRight, BarChart3, User, Building, Search, ChevronLeft, ChevronDown } from 'lucide-react';
+"use client";
+import { useEffect, useState } from "react";
+import {
+  FileText,
+  Linkedin,
+  ChevronRight,
+  BarChart3,
+  User,
+  Building,
+  Search,
+  ChevronLeft,
+  ChevronDown,
+  Info,
+} from "lucide-react";
+import { JobApplication } from "@/types/JobApplication";
+import { useUserStore } from "@/zustand/userDataStore";
 
 export default function ApplicationsPage() {
-  const applications = [
-    { 
-      name: 'John Doe', 
-      position: 'Senior Developer', 
-      stage: 'Interview', 
-      score: 85,
-      resumeUrl: '/resumes/john-doe.pdf',
-      linkedinScore: 92
-    },
-    { 
-      name: 'Jane Smith', 
-      position: 'Product Manager', 
-      stage: 'Screening', 
-      score: 92,
-      resumeUrl: '/resumes/jane-smith.pdf',
-      linkedinScore: 88
-    },
-    { 
-      name: 'Mike Johnson', 
-      position: 'UI/UX Designer', 
-      stage: 'Applied', 
-      score: 78,
-      resumeUrl: '/resumes/mike-johnson.pdf',
-      linkedinScore: 85
-    },
-  ];
+  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const user = useUserStore((state) => state.user);
+  const company_id = user.Company_User[0]?.company_id; // Assuming the first entry is the relevant one
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const response = await fetch(
+          `/api/job-application/by-company?company_id=${company_id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        console.log(data);
+
+        // Check if the response is ok and contains applications
+        if (response.ok) {
+          setApplications(data.applications);
+        } else {
+          console.error("Error fetching applications:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching applications:", error);
+      }
+    };
+
+    fetchApplications();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -41,7 +61,7 @@ export default function ApplicationsPage() {
       <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h1 className="text-2xl font-semibold">Applications</h1>
-          
+
           {/* Search Bar */}
           <div className="relative w-full sm:w-72">
             <input
@@ -52,7 +72,7 @@ export default function ApplicationsPage() {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
           </div>
         </div>
-        
+
         {/* Enhanced Filters - Responsive */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex items-center border rounded-lg px-3 py-2 w-full sm:w-48 hover:border-gray-400 transition-colors">
@@ -91,10 +111,16 @@ export default function ApplicationsPage() {
                 </th>
                 <th className="pb-3">Position</th>
                 <th className="pb-3">Stage</th>
-                <th className="pb-3">AI Score</th>
+                <th className="pb-3">Resume</th>
+                <th className="pb-3">Linkedin</th>
                 <th className="pb-3">Actions</th>
               </tr>
             </thead>
+            {applications && applications.length === 0 && (
+              <div className="flex justify-center items-center">
+                <p className=" text-gray-500 py-4">No applications yet!</p>
+              </div>
+            )}
             <tbody>
               {applications.map((application, index) => (
                 <tr key={index} className="border-b last:border-b-0">
@@ -103,26 +129,48 @@ export default function ApplicationsPage() {
                       <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
                         <User className="w-4 h-4 text-gray-600" />
                       </div>
-                      {application.name}
+                      {application.user?.name} {application.user?.surname}
                     </div>
                   </td>
-                  <td className="py-4">{application.position}</td>
+                  <td className="py-4">{application.job?.title}</td>
                   <td className="py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      application.stage === 'Interview' ? 'bg-blue-100 text-blue-800' :
-                      application.stage === 'Screening' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        application.stage === "Interview"
+                          ? "bg-blue-100 text-blue-800"
+                          : application.stage === "Screening"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
                       {application.stage}
                     </span>
                   </td>
+
                   <td className="py-4">
-                    <span className={`font-semibold ${
-                      application.score >= 90 ? 'text-green-600' :
-                      application.score >= 80 ? 'text-blue-600' :
-                      'text-yellow-600'
-                    }`}>
-                      {application.score}%
+                    <span
+                      className={`font-semibold ${
+                        Number(application.resume_score ?? 0) >= 90
+                          ? "text-green-600"
+                          : Number(application.resume_score ?? 0) >= 80
+                          ? "text-blue-600"
+                          : "text-yellow-600"
+                      }`}
+                    >
+                      {application.resume_score}%
+                    </span>
+                  </td>
+                  <td className="py-4">
+                    <span
+                      className={`font-semibold ${
+                        Number(application.linkedin_score ?? 0) >= 90
+                          ? "text-green-600"
+                          : Number(application.linkedin_score ?? 0) >= 80
+                          ? "text-blue-600"
+                          : "text-yellow-600"
+                      }`}
+                    >
+                      {application.linkedin_score}%
                     </span>
                   </td>
                   <td className="py-4">
@@ -131,9 +179,9 @@ export default function ApplicationsPage() {
                         <FileText className="w-4 h-4" />
                         Resume
                       </button>
-                      <button className="text-purple-600 hover:text-purple-800 inline-flex items-center gap-1">
-                        <Linkedin className="w-4 h-4" />
-                        LinkedIn
+                      <button className="text-purple-600 hover:text-blue-800 inline-flex items-center gap-1">
+                        <Info className="w-4 h-4" />
+                        View
                       </button>
                     </div>
                   </td>
@@ -146,34 +194,48 @@ export default function ApplicationsPage() {
         {/* Mobile Card View */}
         <div className="md:hidden space-y-4">
           {applications.map((application, index) => (
-            <div key={index} className="bg-white border rounded-lg p-4 space-y-4">
+            <div
+              key={index}
+              className="bg-white border rounded-lg p-4 space-y-4"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                     <User className="w-5 h-5 text-gray-600" />
                   </div>
                   <div>
-                    <h3 className="font-medium">{application.name}</h3>
-                    <p className="text-sm text-gray-600">{application.position}</p>
+                    <h3 className="font-medium">{application.id}</h3>
+                    <p className="text-sm text-gray-600">
+                      {application.job?.title}
+                    </p>
                   </div>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs ${
+                {/* <span className={`px-2 py-1 rounded-full text-xs ${
                   application.stage === 'Interview' ? 'bg-blue-100 text-blue-800' :
                   application.stage === 'Screening' ? 'bg-yellow-100 text-yellow-800' :
                   'bg-gray-100 text-gray-800'
                 }`}>
                   {application.stage}
-                </span>
+                </span> */}
+                <td>
+                  <span className="bg-blue-100 text-blue-800 p-1 rounded-sm">
+                    Interview
+                  </span>
+                </td>
               </div>
 
               <div className="flex items-center justify-between py-2 border-t border-b">
-                <span className="text-sm text-gray-600">AI Score</span>
-                <span className={`font-semibold ${
-                  application.score >= 90 ? 'text-green-600' :
-                  application.score >= 80 ? 'text-blue-600' :
-                  'text-yellow-600'
-                }`}>
-                  {application.score}%
+                <span className="text-sm text-gray-600">Resume</span>
+                <span
+                  className={`font-semibold ${
+                    Number(application.resume_score ?? 0) >= 90
+                      ? "text-green-600"
+                      : Number(application.resume_score ?? 0) >= 80
+                      ? "text-blue-600"
+                      : "text-yellow-600"
+                  }`}
+                >
+                  {application.resume_score}%
                 </span>
               </div>
 
@@ -183,8 +245,8 @@ export default function ApplicationsPage() {
                   Resume
                 </button>
                 <button className="flex-1 text-purple-600 hover:text-purple-800 inline-flex items-center justify-center gap-1 py-2">
-                  <Linkedin className="w-4 h-4" />
-                  LinkedIn
+                  <Info className="w-4 h-4" />
+                  View
                 </button>
               </div>
             </div>
@@ -194,15 +256,26 @@ export default function ApplicationsPage() {
         {/* Pagination */}
         <div className="mt-6 flex items-center justify-between border-t pt-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Showing 1-3 of 12 results</span>
+            <span className="text-sm text-gray-600">
+              Showing 1-3 of 12 results
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <button
+              className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled
+            >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg bg-blue-50 text-blue-600 font-medium">1</button>
-            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50">2</button>
-            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50">3</button>
+            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg bg-blue-50 text-blue-600 font-medium">
+              1
+            </button>
+            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50">
+              2
+            </button>
+            <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50">
+              3
+            </button>
             <button className="inline-flex items-center justify-center w-8 h-8 border rounded-lg hover:bg-gray-50">
               <ChevronRight className="w-4 h-4" />
             </button>

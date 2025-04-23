@@ -10,6 +10,7 @@ interface Company_User{
 }
 
 interface User {
+  id: string;
   bio?: string;
   city?: string;
   country?: string;
@@ -28,6 +29,7 @@ interface User {
 }
 
 const initialState: User = {
+  id: "",
   bio: "",
   city: "",
   country: "",  // Fixed typo from 'countr'

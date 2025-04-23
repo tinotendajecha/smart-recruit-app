@@ -65,6 +65,7 @@ model Company {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   Job               Job[]
+  JobApplications   JobApplication[]
 }
 
 model Company_User {
@@ -123,6 +124,10 @@ model JobApplication {
   cover_letter  String?
   resume_score String?
   linkedin_score String?
+  resume_markup String?
+  companyId Company? @relation(fields: [company_id], references: [id])
+  company_id String?
+  stage String? @default("applied") // applied, interview, offer, etc.
   status        String   @default("pending") // pending, accepted, rejected, etc.
   appliedAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

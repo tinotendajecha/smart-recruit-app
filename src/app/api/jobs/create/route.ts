@@ -11,6 +11,8 @@ export async function POST(req: Request) {
     // Get the user data from the request body
     const body: Job = await req.json()
 
+    console.log(body)
+
     // Create the job
     const job = await prisma.job.create({
         data: {

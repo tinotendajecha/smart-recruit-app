@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { useUserStore } from '@/zustand/userDataStore';
+// import { User } from '@/types/User'; // Removed as it's not needed
 
 // Define Zod schema for form validation
 const jobFormSchema = z.object({
@@ -148,6 +150,9 @@ export default function CreateJobPage() {
     status: 'draft'
   });
 
+  // Load user data from Zustand store
+  const user = useUserStore(state => state.user);
+
   const [errors, setErrors] = useState<ValidationErrors>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -176,6 +181,16 @@ export default function CreateJobPage() {
     try {
       // Validate form data
       const jobData = jobFormSchema.parse(formData);
+
+      // Append companyId to jobData
+      const companyId = user.Company_User[0].company_id
+
+      const jobDataWithCompanyId = {
+        ...jobData,
+        company_id: companyId
+      }
+
+      console.log('Job Data with Company ID:', jobDataWithCompanyId);
       
       // If validation passes, clear errors and submit
       setErrors({});
@@ -187,7 +202,7 @@ export default function CreateJobPage() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(jobData)
+        body: JSON.stringify(jobDataWithCompanyId)
       })
 
       const data = await response.json()
