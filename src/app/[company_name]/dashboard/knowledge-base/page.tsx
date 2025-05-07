@@ -1,59 +1,121 @@
-'use client';
+"use client";
+import { useEffect, useState } from "react";
+import { ChevronRight } from "lucide-react";
+// import DocumentUploadTab from "./components/DocumentUploadTab";
+// import DocumentListTab from "./components/DocumentListTab";
+import DocumentUploadTab from "./components/DocumentUploadTab";
+import DocumentListTab from "./components/DocumentListTab";
+import { useUserStore } from "@/zustand/userDataStore";
 
-import { ChevronRight, Upload } from 'lucide-react';
+export interface FileData {
+  id: string;
+  file_name: string;
+  type: string;
+  uploadDate: string;
+}
 
-export default function ChatAgentPage() {
+export default function KnowledgeBasePage() {
+  const [activeTab, setActiveTab] = useState<'upload' | 'documents'>('documents');
+  const [files, setFiles] = useState<File[]>([]);
+  const [documents, setDocuments] = useState<FileData[]>([]);
+
+  const  user  = useUserStore(state => state.user);
+  const companyId = user.Company_User[0]?.company_id; // Assuming the first entry is the relevant one
+
+ 
+    const fetchDocuments = async () => {
+      const response = await fetch(`/api/documents/get-documents?companyId=${companyId}`);
+      const data = await response.json();
+      console.log(data)
+      setDocuments(data.documents);
+    };
+
+    // fetchDocuments();
+
+    useEffect(() => {
+      if(companyId){
+        fetchDocuments()
+      }
+    }, [companyId])
+
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setFiles(prev => [...prev, ...newFiles]);
+    }
+  };
+
+  const handleDeleteFile = (fileId: string) => {
+    setDocuments((documents ?? []).filter(doc => doc.id !== fileId));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center text-sm text-gray-500">
         <span>Dashboard</span>
         <ChevronRight className="w-4 h-4 mx-2" />
-        <span className="text-gray-900">Chat Agent</span>
+        <span className="text-gray-900">Knowledge Base</span>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-        <h1 className="text-2xl font-semibold mb-6">Chat Agent Management</h1>
-        
+        <h1 className="text-2xl font-semibold mb-6">Knowledge Base Management</h1>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-medium mb-2">Today's Queries</h3>
-            <p className="text-3xl font-bold text-green-600">247</p>
+            <h3 className="text-lg font-medium mb-2">Total Documents</h3>
+            <p className="text-3xl font-bold text-green-600">{documents.length}</p>
           </div>
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-medium mb-2">Response Rate</h3>
-            <p className="text-3xl font-bold text-blue-600">98.5%</p>
+            <h3 className="text-lg font-medium mb-2">Processing Rate</h3>
+            <p className="text-3xl font-bold text-blue-600">99.2%</p>
           </div>
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-medium mb-2">Avg. Response Time</h3>
-            <p className="text-3xl font-bold text-purple-600">1.2s</p>
+            <h3 className="text-lg font-medium mb-2">Avg. Processing Time</h3>
+            <p className="text-3xl font-bold text-purple-600">2.4s</p>
           </div>
         </div>
-        
-        {/* Upload Section */}
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 md:p-8 text-center">
-          <h3 className="text-lg font-medium mb-2">Upload Knowledge Base Documents For Chat Agent</h3>
-          <p className="text-gray-500 mb-4">Drop your PDF, DOCX, or TXT files here</p>
-          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 inline-flex items-center gap-2">
-            <Upload className="w-5 h-5" />
-            Select Files
-          </button>
-        </div>
-      </div>
 
-      {/* Test Chat Section */}
-      <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-        <h2 className="text-xl font-semibold mb-4">Test Chat Agent</h2>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <input
-            type="text"
-            placeholder="Type a test question..."
-            className="flex-1 border rounded-lg px-4 py-2"
-          />
-          <button className="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-            Test
-          </button>
+        {/* Tabs */}
+        <div className="border-b border-gray-200 mb-6">
+          <div className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('upload')}
+              className={`pb-4 font-medium text-sm ${
+                activeTab === 'upload'
+                  ? 'border-b-2 border-green-600 text-green-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Upload Documents
+            </button>
+            <button
+              onClick={() => setActiveTab('documents')}
+              className={`pb-4 font-medium text-sm ${
+                activeTab === 'documents'
+                  ? 'border-b-2 border-green-600 text-green-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Document Library
+            </button>
+          </div>
         </div>
+
+        {/* Tab Content */}
+        {activeTab === 'upload' ? (
+          <DocumentUploadTab 
+            files={files} 
+            onFileChange={handleFileChange}
+            onUploadSuccess = {fetchDocuments}
+          />
+        ) : (
+          <DocumentListTab 
+            documents={documents}
+            onDeleteFile={handleDeleteFile}
+          />
+        )}
       </div>
     </div>
   );

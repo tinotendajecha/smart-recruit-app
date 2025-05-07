@@ -66,6 +66,7 @@ model Company {
   updatedAt         DateTime       @updatedAt
   Job               Job[]
   JobApplications   JobApplication[]
+  PDF_Documents     Pdf_Documents[]
 }
 
 model Company_User {
@@ -131,4 +132,12 @@ model JobApplication {
   status        String   @default("pending") // pending, accepted, rejected, etc.
   appliedAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model Pdf_Documents{
+  id String @id @default(uuid())
+  company_id String
+  company Company @relation(fields: [company_id], references: [id])
+  file_name String
+  uploadDate DateTime @default(now())
 }

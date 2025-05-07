@@ -51,10 +51,7 @@ export default function JobApplicationPage() {
         const data = await response.json();
 
         // console.log("Job Data:", data.job);
-        setJobData(data.job);
-
-        // console.log("Job Data:", jobData)
-        // console.log("Job Data:", jobData);
+        setJobData(data.job); 
         
         setLoading(false);
       } catch (error) {
