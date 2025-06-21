@@ -1,11 +1,37 @@
 'use client';
+import { format } from 'date-fns';
 
 import { ChevronRight, Building, MapPin, Clock, CheckCircle2, XCircle, Timer, FileText, ChevronLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { JobApplication } from '@/types/JobApplication';
+import { useUserStore } from '@/zustand/userDataStore';
 
 export default function MyApplicationsPage() {
+
+  const user = useUserStore((state) => state.user);
+
+  const userId = user.id
+
   const [applications, setApplications] = useState<JobApplication[]>([])
+
+  useEffect(() => {
+    // Get job application by user id
+    const fetchApplications = async () => {
+      try {
+        const response = await fetch(`/api/job-application/user/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch applications');
+        }
+        const data = await response.json();
+
+        setApplications(data.applications);
+      } catch (error) {
+        console.error('Error fetching job applications:', error);
+      }
+    };
+
+    fetchApplications()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -43,21 +69,16 @@ export default function MyApplicationsPage() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
-                          Applied {application.appliedAt.toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
+                          Applied {format(new Date(application.appliedAt), 'MMMM d, yyyy')}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-sm ${
-                    application.status === 'success' ? 'bg-green-100 text-green-800' :
-                    application.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {application.status}
+                  <span className={`px-3 py-1 rounded-full text-sm ${application.stage === 'Hired' ? 'bg-green-100 text-green-800' :
+                    application.stage === 'Review' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                    {application.stage} 🎉
                   </span>
                 </div>
                 <div className="mt-4 pt-4 border-t flex items-center justify-between">
@@ -94,23 +115,18 @@ export default function MyApplicationsPage() {
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
-                      {application.appliedAt.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
+                      {format(new Date(application.appliedAt), 'MMMM d, yyyy')}
                     </span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-3">
-                <span className={`inline-block px-2 py-1 rounded-full text-xs ${
-                  application.status === 'success' ? 'bg-green-100 text-green-800' :
-                  application.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {application.status}
+                <span className={`inline-block px-2 py-1 rounded-full text-xs ${application.stage === 'Hired' ? 'bg-green-100 text-green-800' :
+                  application.stage === 'Review' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                  {application.stage} 🎉
                 </span>
               </div>
 

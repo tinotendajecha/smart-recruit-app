@@ -1,10 +1,10 @@
 'use client';
 
-import { 
-  Briefcase, 
-  Building, 
-  MapPin, 
-  Clock, 
+import {
+  Briefcase,
+  Building,
+  MapPin,
+  Clock,
   Search,
   DollarSign,
   Filter,
@@ -12,42 +12,49 @@ import {
 } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
-
-// This would be fetched from your API based on the company
-const companyData = {
-  name: 'Yirifi',
-  logo: 'https://ui-avatars.com/api/?name=Yirifi&background=0A5C36&color=fff',
-  description: 'Building the future of African technology',
-  location: 'Harare, Zimbabwe',
-  website: 'https://yirifi.com'
-};
-
-// Mock jobs data - would come from your API
-const jobs = [
-  {
-    id: 1,
-    title: 'Senior Developer',
-    department: 'Engineering',
-    type: 'Full-time',
-    location: 'Remote',
-    salary: { min: 120000, max: 150000 },
-    postedDate: '2 days ago',
-    description: 'We are looking for an experienced developer to join our team...'
-  },
-  {
-    id: 2,
-    title: 'Product Manager',
-    department: 'Product',
-    type: 'Full-time',
-    location: 'Harare',
-    salary: { min: 130000, max: 160000 },
-    postedDate: '1 week ago',
-    description: 'Seeking a product manager to lead our product initiatives...'
-  },
-];
+import { Job } from '@/types/Job';
+import { useState } from 'react';
+import { Company } from '@/types/Company';
+import { format } from 'date-fns';
 
 export default function CompanyOpeningsPage() {
+  const { company_name } = useParams();
 
+  const [companyData, setCompanyData] = useState<Company>()
+  const [jobs, setJobs] = useState<Job[]>([]);
+
+  useEffect(() => {
+    // Fetch company jobs from API based on company_name
+    const fetchCompanyData = async () => {
+      const response = await fetch(`/api/company/get-company-by-name/${company_name}`);
+
+      if (!response.ok) {
+        console.error('Failed to fetch company data');
+        return;
+      }
+
+      const data = await response.json();
+
+      setCompanyData(data.data);
+
+      console.log('Company Data:', data.data);
+
+      setJobs(data.data.Job || []);
+
+      if (data.error) {
+        console.error(data.error);
+        return;
+      }
+    }
+    fetchCompanyData()
+  }, [])
+
+  function formatCompanyName(slug: string) {
+    return slug
+      .split('-')                           // split by dash
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // capitalize each word
+      .join(' ');                           // join with spaces
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -55,22 +62,24 @@ export default function CompanyOpeningsPage() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-            <img
+            {/* <img
               src={companyData.logo}
               alt={companyData.name}
               className="w-16 h-16 rounded-lg"
-            />
+            /> */}
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{companyData.name}</h1>
-              <p className="text-gray-500 mt-1">{companyData.description}</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                {formatCompanyName(typeof company_name === 'string' ? company_name : Array.isArray(company_name) ? company_name[0] ?? '' : '')}
+              </h1>
+              <p className="text-gray-500 mt-1">{companyData?.short_description}</p>
               <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-600">
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
-                  {companyData.location}
+                  {companyData?.city}, {companyData?.country}
                 </div>
-                <a 
-                  href={companyData.website} 
-                  target="_blank" 
+                <a
+                  href={companyData?.company_website}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-green-600 hover:text-green-700"
                 >
@@ -115,7 +124,7 @@ export default function CompanyOpeningsPage() {
       <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 sm:px-6 lg:px-8">
         <div className="space-y-4 sm:space-y-6">
           {jobs.map((job) => (
-            <div 
+            <div
               key={job.id}
               className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200"
             >
@@ -136,13 +145,13 @@ export default function CompanyOpeningsPage() {
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
-                        Posted {job.postedDate}
+                        Posted {format(new Date(job.createdAt), 'MMMM d, yyyy')}
                       </div>
                     </div>
                   </div>
-                  <button 
+                  <button
                     className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center"
-                    onClick={() => window.location.href = `/yirifi/openings/${job.id}/apply`}
+                    onClick={() => window.location.href = `/${company_name}/openings/apply/${job.id}`}
                   >
                     Apply Now
                   </button>
@@ -154,11 +163,11 @@ export default function CompanyOpeningsPage() {
 
                 <div className="mt-4 flex flex-wrap items-center gap-3 sm:gap-4">
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm bg-green-100 text-green-800">
-                    {job.type}
+                    {job.title}
                   </span>
                   <span className="inline-flex items-center gap-1 text-sm text-gray-600">
                     <DollarSign className="w-4 h-4" />
-                    ${job.salary.min.toLocaleString()} - ${job.salary.max.toLocaleString()}
+                    ${job.compensation_minimum} - ${job.compensation_maximum}
                   </span>
                 </div>
               </div>

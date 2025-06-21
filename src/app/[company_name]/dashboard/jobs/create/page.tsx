@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+// import { useEffect  } from 'react';
 import { z } from 'zod';
 import { 
   Briefcase, 
@@ -149,6 +150,8 @@ export default function CreateJobPage() {
     benefits_list: [],
     status: 'draft'
   });
+
+  // console.log(formData)
 
   // Load user data from Zustand store
   const user = useUserStore(state => state.user);

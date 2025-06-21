@@ -105,18 +105,18 @@ export default function DashboardLayout({
       path: `/${company_name}/dashboard/knowledge-base`,
       role: "Admin",
     },
-    // {
-    //   name: "Team",
-    //   icon: <UserPlus className="w-5 h-5" />,
-    //   path: `/${company_name}/dashboard/team`,
-    //   role: 'Admin'
-    // },
     {
-      name: "Invite",
-      icon: <Mail className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/invites`,
-      role: "Admin",
+      name: "Team",
+      icon: <UserPlus className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/team`,
+      role: 'Admin'
     },
+    // {
+    //   name: "Invite",
+    //   icon: <Mail className="w-5 h-5" />,
+    //   path: `/${company_name}/dashboard/invites`,
+    //   role: "Admin",
+    // },
     {
       name: "Companies",
       icon: <Building2 className="w-5 h-5" />,

@@ -238,10 +238,10 @@ export default function JobApplicationPage() {
                 {jobData?.title}
               </h1>
               <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
-                <div className="flex items-center gap-1">
+                {/* <div className="flex items-center gap-1">
                   <Building className="w-4 h-4" />
-                  {jobData?.company_id}
-                </div>
+                  {jobData?.location}
+                </div> */}
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
                   {jobData?.location}

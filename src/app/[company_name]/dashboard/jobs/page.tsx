@@ -42,61 +42,90 @@ export default function JobsPage() {
   const [totalJobs, setTotalJobs] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  // Function for getting jobs
-  const getJobs = async (page:number = 1) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/jobs/get-jobs?page=${page}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      interface dataResponseInterface {
-        jobs: Job[];
-        totalJobs: number;
-        currentPage: number;
-        totalPages: number;
-        message: string;
+  useEffect(() => {
+      // Fetch company jobs from API based on company_name
+      const fetchCompanyData = async () => {
+        const response = await fetch(`/api/company/get-company-by-name/${company_name}`);
+  
+        if (!response.ok) {
+          console.error('Failed to fetch company data');
+          return;
+        }
+  
+        const data = await response.json();
+  
+        // setCompanyData(data.data);
+  
+        console.log('Company Data:', data.data);
+  
+        setJobs(data.data.Job || []);
+  
+        if (data.error) {
+          console.error(data.error);
+          return;
+        }
       }
-
-      // Set jobs
-      const data: dataResponseInterface = await response.json();
-
-      if (response.status == 200) {
-        setJobs(data.jobs);
-        console.log(data);
-        // set Jobs count
-        setJobsPerPageCount(data.jobs.length);
-
-        // Set current page
-        setCurrentPage(data.currentPage);
-
-        // Set total Jobs
-        setTotalJobs(data.totalJobs);
+      fetchCompanyData()
+    }, [])
 
 
-        // Set total pages
-        setTotalPages(data.totalPages);
+  // 
 
-        // set is loading to false
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // // Function for getting jobs
+  // const getJobs = async (page:number = 1) => {
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await fetch(`/api/jobs/get-jobs?page=${page}`, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+
+  //     interface dataResponseInterface {
+  //       jobs: Job[];
+  //       totalJobs: number;
+  //       currentPage: number;
+  //       totalPages: number;
+  //       message: string;
+  //     }
+
+  //     // Set jobs
+  //     const data: dataResponseInterface = await response.json();
+
+  //     if (response.status == 200) {
+  //       setJobs(data.jobs);
+  //       console.log(data);
+  //       // set Jobs count
+  //       setJobsPerPageCount(data.jobs.length);
+
+  //       // Set current page
+  //       setCurrentPage(data.currentPage);
+
+  //       // Set total Jobs
+  //       setTotalJobs(data.totalJobs);
+
+
+  //       // Set total pages
+  //       setTotalPages(data.totalPages);
+
+  //       // set is loading to false
+  //       setIsLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   // Get jobs when page number changes
-  useEffect(() => {
-    getJobs(currentPage);
-  }, [currentPage])
+  // useEffect(() => {
+  //   getJobs(currentPage);
+  // }, [currentPage])
 
   // Get jobs when page loads
-  useEffect(() => {
-    getJobs();
-  }, []);
+  // useEffect(() => {
+  //   getJobs();
+  // }, []);
 
   // Get Jobs when page number changes
 

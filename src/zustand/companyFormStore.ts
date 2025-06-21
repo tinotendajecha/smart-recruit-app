@@ -13,8 +13,6 @@ interface Company {
 }
 
 
-
-
 export const useFormStore = create<Company>()(persist(
     (set) => ({
         cityLocation: "",

@@ -58,12 +58,12 @@ export default function MobileMenu() {
       path: `/${company_name}/dashboard/knowledge-base`,
       role: "Admin",
     },
-    // {
-    //   name: "Team",
-    //   icon: <UserPlus className="w-5 h-5" />,
-    //   path: `/${company_name}/dashboard/team`,
-    //   role: 'Admin'
-    // },
+    {
+      name: "Team",
+      icon: <UserPlus className="w-5 h-5" />,
+      path: `/${company_name}/dashboard/team`,
+      role: 'Admin'
+    },
     {
       name: "My Applications",
       icon: <FileText className="w-5 h-5" />,
@@ -71,12 +71,12 @@ export default function MobileMenu() {
       role: "Candidate",
     },
 
-    {
-      name: "Invite",
-      icon: <Mail className="w-5 h-5" />,
-      path: `/${company_name}/dashboard/invites`,
-      role: "Admin",
-    },
+    // {
+    //   name: "Invite",
+    //   icon: <Mail className="w-5 h-5" />,
+    //   path: `/${company_name}/dashboard/invites`,
+    //   role: "Admin",
+    // },
     {
       name: "Settings",
       icon: <Settings className="w-5 h-5" />,
